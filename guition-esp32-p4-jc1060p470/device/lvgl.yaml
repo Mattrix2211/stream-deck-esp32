@@ -342,7 +342,7 @@ lvgl:
                   text_font: $icon_font
                   align: top_left
                   id: network_rack_icon
-                  text: $home
+                  text: $power
               - label:
                   align: bottom_left
                   id: network_rack_label
