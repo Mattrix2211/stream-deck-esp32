@@ -186,12 +186,6 @@ sensor:
             args:
               - id(indoor_temperature).state
               - x
-
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: "IP Address"
-
   - platform: homeassistant
     id: current_time_ha
     entity_id: sensor.time
