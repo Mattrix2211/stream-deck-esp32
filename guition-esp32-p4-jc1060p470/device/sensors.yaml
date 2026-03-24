@@ -172,7 +172,8 @@ sensor:
           text:
             format: "Lum : %.0f%%"
             args:
-              - !lambda 'return (x / 255.0f) * 100.0f;'
+              - !lambda |-
+                  return (x / 255.0) * 100.0;
 
   # Bureau - température réelle si supportée
   - platform: homeassistant
