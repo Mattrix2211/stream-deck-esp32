@@ -131,27 +131,6 @@ binary_sensor:
           state:
             checked: !lambda 'return x;'
 
-  # Toilette
-  - platform: homeassistant
-    id: toilette_light_state
-    entity_id: light.ampoule_toilette
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: storage_lights_button
-          state:
-            checked: !lambda 'return x;'
-
-  # Case libre (dupliquée sur Salon pour l'instant)
-  - platform: homeassistant
-    id: libre_light_state
-    entity_id: light.0x00178801062d1c11
-    trigger_on_initial_state: true
-    on_state:
-      - lvgl.widget.update:
-          id: network_rack_button
-          state:
-            checked: !lambda 'return x;'
 
 sensor:
   # Température 1
