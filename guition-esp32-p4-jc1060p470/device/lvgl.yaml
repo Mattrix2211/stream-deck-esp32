@@ -323,3 +323,86 @@ lvgl:
                   data:
                     entity_id: switch.lampe_couloir
 
+
+
+        # Panneau latéral
+        - obj:
+            id: side_panel
+            width: 250
+            height: 100%
+            bg_color: 0x111111
+            bg_opa: COVER
+            radius: 12
+            pad_all: 12
+            border_width: 1
+            border_color: 0x2A2A2A
+            layout:
+              type: flex
+              flex_flow: column
+              pad_row: 10
+            widgets:
+              - label:
+                  id: selected_light_title
+                  text: "Aucune sélection"
+                  text_color: 0xFFFFFF
+
+              - label:
+                  id: selected_light_status
+                  text: "État : --"
+                  text_color: 0xCCCCCC
+
+              - label:
+                  id: selected_light_brightness
+                  text: "Lum : --"
+                  text_color: 0xCCCCCC
+
+              - label:
+                  id: selected_light_temp
+                  text: "Temp : --"
+                  text_color: 0xCCCCCC
+
+              - label:
+                  id: selected_light_color
+                  text: "Couleur : --"
+                  text_color: 0xCCCCCC
+
+              - button:
+                  id: quick_toggle_button
+                  height: 55
+                  width: 100%
+                  styles: control
+                  widgets:
+                    - label:
+                        text: "ON / OFF"
+                        align: center
+
+              - button:
+                  id: quick_25_button
+                  height: 50
+                  width: 100%
+                  styles: control
+                  widgets:
+                    - label:
+                        text: "25%"
+                        align: center
+
+              - button:
+                  id: quick_50_button
+                  height: 50
+                  width: 100%
+                  styles: control
+                  widgets:
+                    - label:
+                        text: "50%"
+                        align: center
+
+              - button:
+                  id: quick_100_button
+                  height: 50
+                  width: 100%
+                  styles: control
+                  widgets:
+                    - label:
+                        text: "100%"
+                        align: center
+
