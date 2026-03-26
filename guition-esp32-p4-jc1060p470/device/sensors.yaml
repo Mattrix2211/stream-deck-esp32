@@ -176,20 +176,6 @@ sensor:
             args:
               - x
 
-  # Bureau - température réelle si supportée
-  - platform: homeassistant
-    id: bureau_temp
-    entity_id: light.ampoule_bureau
-    attribute: color_temp
-    internal: true
-    on_value:
-      - lvgl.label.update:
-          id: selected_light_temp
-          text:
-            format: "Temp : %.0f"
-            args:
-              - x
-
 
 text_sensor:
   # Heure
