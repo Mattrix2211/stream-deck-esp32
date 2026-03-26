@@ -318,8 +318,7 @@ lvgl:
                     entity_id: switch.lampe_couloir
 
 
-
-             # Panneau latéral
+        # Panneau latéral
         - obj:
             id: side_panel
             width: 250
@@ -419,5 +418,3 @@ lvgl:
                           - label:
                               text: "100%"
                               align: center
-                          brightness_pct: "100"
-
