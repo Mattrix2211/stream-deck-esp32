@@ -325,7 +325,7 @@ lvgl:
 
 
 
-        # Panneau latéral
+             # Panneau latéral
         - obj:
             id: side_panel
             width: 250
@@ -333,13 +333,13 @@ lvgl:
             bg_color: 0x111111
             bg_opa: COVER
             radius: 12
-            pad_all: 12
+            pad_all: 14
             border_width: 1
             border_color: 0x2A2A2A
             layout:
               type: flex
               flex_flow: column
-              pad_row: 10
+              pad_row: 12
             widgets:
               - label:
                   id: selected_light_title
@@ -348,7 +348,7 @@ lvgl:
 
               - button:
                   id: selected_light_toggle_button
-                  height: 55
+                  height: 48
                   width: 100%
                   styles: control
                   on_press:
@@ -367,76 +367,63 @@ lvgl:
                   text: "Lum : --"
                   text_color: 0xCCCCCC
 
-              - label:
-                  id: selected_light_temp
-                  text: "Temp : --"
-                  text_color: 0xCCCCCC
-
-              - label:
-                  id: selected_light_color
-                  text: "Couleur : --"
-                  text_color: 0xCCCCCC
-
-              - button:
-                  id: quick_toggle_button
-                  height: 55
+              - obj:
                   width: 100%
-                  styles: control
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  layout:
+                    type: flex
+                    flex_flow: row
+                    pad_column: 8
                   widgets:
-                    - label:
-                        text: "ON / OFF"
-                        align: center
-                  on_press:
-                    - homeassistant.service:
-                        service: light.toggle
-                        data:
-                          entity_id: light.ampoule_bureau
+                    - button:
+                        id: quick_25_button
+                        height: 44
+                        width: 70
+                        styles: control
+                        on_press:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: light.ampoule_bureau
+                                brightness_pct: "25"
+                        widgets:
+                          - label:
+                              text: "25%"
+                              align: center
 
-              - button:
-                  id: quick_25_button
-                  height: 50
-                  width: 100%
-                  styles: control
-                  widgets:
-                    - label:
-                        text: "25%"
-                        align: center
-                  on_press:
-                    - homeassistant.service:
-                        service: light.turn_on
-                        data:
-                          entity_id: light.ampoule_bureau
-                          brightness_pct: "25"
+                    - button:
+                        id: quick_50_button
+                        height: 44
+                        width: 70
+                        styles: control
+                        on_press:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: light.ampoule_bureau
+                                brightness_pct: "50"
+                        widgets:
+                          - label:
+                              text: "50%"
+                              align: center
 
-              - button:
-                  id: quick_50_button
-                  height: 50
-                  width: 100%
-                  styles: control
-                  widgets:
-                    - label:
-                        text: "50%"
-                        align: center
-                  on_press:
-                    - homeassistant.service:
-                        service: light.turn_on
-                        data:
-                          entity_id: light.ampoule_bureau
-                          brightness_pct: "50"
-
-              - button:
-                  id: quick_100_button
-                  height: 50
-                  width: 100%
-                  styles: control
-                  widgets:
-                    - label:
-                        text: "100%"
-                        align: center
-                  on_press:
-                    - homeassistant.service:
-                        service: light.turn_on
-                        data:
-                          entity_id: light.ampoule_bureau
+                    - button:
+                        id: quick_100_button
+                        height: 44
+                        width: 70
+                        styles: control
+                        on_press:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: light.ampoule_bureau
+                                brightness_pct: "100"
+                        widgets:
+                          - label:
+                              text: "100%"
+                              align: center
                           brightness_pct: "100"
 
