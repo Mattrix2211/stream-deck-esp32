@@ -71,16 +71,10 @@ lvgl:
                   text: "Bureau"
               - lvgl.label.update:
                   id: selected_light_toggle_label
-                  text: "Bureau"
+                  text: "Allumer / Éteindre"
               - lvgl.label.update:
                   id: selected_light_brightness
                   text: "Lum : --"
-              - lvgl.label.update:
-                  id: selected_light_temp
-                  text: "Temp : --"
-              - lvgl.label.update:
-                  id: selected_light_color
-                  text: "Couleur : --"
 
         # Fado bureau
         - button:
