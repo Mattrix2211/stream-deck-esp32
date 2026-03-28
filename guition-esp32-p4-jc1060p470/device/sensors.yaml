@@ -1,3 +1,112 @@
+globals:
+  - id: selected_light
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: selected_light_name
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: selected_light_is_dimmable
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: selected_light_is_switch
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: selected_light_valid
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: tile_long_press_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+script:
+  - id: reset_light_context
+    then:
+      - lambda: |-
+          id(selected_light).clear();
+          id(selected_light_name).clear();
+          id(selected_light_is_dimmable) = false;
+          id(selected_light_is_switch) = false;
+          id(selected_light_valid) = false;
+          id(tile_long_press_active) = false;
+      - lvgl.label.update:
+          id: selected_light_title
+          text: "Aucune sélection"
+      - lvgl.label.update:
+          id: selected_light_brightness
+          text: "Lum : --"
+      - lvgl.widget.update:
+          id: quick_25_button
+          state: { disabled: true }
+      - lvgl.widget.update:
+          id: quick_50_button
+          state: { disabled: true }
+      - lvgl.widget.update:
+          id: quick_100_button
+          state: { disabled: true }
+
+  - id: select_light_context
+    parameters:
+      entity_id: string
+      display_name: string
+      is_dimmable: bool
+      is_switch: bool
+    then:
+      - lambda: |-
+          id(selected_light) = entity_id;
+          id(selected_light_name) = display_name;
+          id(selected_light_is_dimmable) = is_dimmable;
+          id(selected_light_is_switch) = is_switch;
+          id(selected_light_valid) = true;
+      - lvgl.label.update:
+          id: selected_light_title
+          text:
+            format: "%s"
+            args: [ display_name.c_str() ]
+      - if:
+          condition:
+            lambda: 'return is_dimmable;'
+          then:
+            - lvgl.widget.update: { id: quick_25_button, state: { disabled: false } }
+            - lvgl.widget.update: { id: quick_50_button, state: { disabled: false } }
+            - lvgl.widget.update: { id: quick_100_button, state: { disabled: false } }
+            - lvgl.label.update: { id: selected_light_brightness, text: "Lum : --" }
+          else:
+            - lvgl.widget.update: { id: quick_25_button, state: { disabled: true } }
+            - lvgl.widget.update: { id: quick_50_button, state: { disabled: true } }
+            - lvgl.widget.update: { id: quick_100_button, state: { disabled: true } }
+            - lvgl.label.update: { id: selected_light_brightness, text: "Lum : N/A" }
+
+  - id: toggle_selected_light
+    then:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid);'
+          then:
+            - homeassistant.service:
+                service: !lambda |-
+                  return id(selected_light_is_switch) ? "switch.toggle" : "light.toggle";
+                data:
+                  entity_id: !lambda 'return id(selected_light);'
+
+  - id: set_selected_light_brightness
+    parameters:
+      brightness_pct: int
+    then:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
+          then:
+            - homeassistant.service:
+                service: light.turn_on
+                data:
+                  entity_id: !lambda 'return id(selected_light);'
+                  brightness_pct: !lambda 'return brightness_pct;'
 binary_sensor:
   # Bureau
   - platform: homeassistant
