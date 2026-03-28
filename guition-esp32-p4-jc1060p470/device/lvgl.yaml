@@ -61,10 +61,7 @@ lvgl:
                   id: scene_features_label
                   text: "Bureau"
             on_press:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.ampoule_bureau
+                    - script.execute: toggle_selected_light
             on_long_press:
               - lvgl.label.update:
                   id: selected_light_title
