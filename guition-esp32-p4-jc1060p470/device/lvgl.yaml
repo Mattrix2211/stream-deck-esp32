@@ -47,7 +47,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_scene_features_button
             styles: control
             widgets:
@@ -80,7 +80,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_scene_calls_button
             styles: control
             widgets:
@@ -103,7 +103,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_scene_evening_button
             styles: control
             widgets:
@@ -126,7 +126,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_scene_dimmed_button
             styles: control
             widgets:
@@ -149,7 +149,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_blind_open_button
             styles: control
             widgets:
@@ -160,7 +160,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "Salon"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -170,7 +170,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_blind_66_button
             styles: control
             widgets:
@@ -181,7 +181,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "Salle à manger"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -191,7 +191,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_blind_33_button
             styles: control
             widgets:
@@ -202,7 +202,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "La boule"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -212,7 +212,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_blind_close_button
             styles: control
             widgets:
@@ -223,7 +223,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "Salle de bain"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -233,7 +233,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: printer_power_button
             styles: control
             widgets:
@@ -245,7 +245,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "Cuisine"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -255,7 +255,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: filament_heater_button
             styles: control
             widgets:
@@ -267,7 +267,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "Led cuisine"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -277,7 +277,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: office_aircon_button
             styles: control
             widgets:
@@ -288,7 +288,7 @@ lvgl:
               - label:
                   align: bottom_left
                   text: "Couloir"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: light.toggle
                   data:
@@ -298,7 +298,7 @@ lvgl:
         - button:
             height: $button_height
             width: $button_width
-            checkable: true
+            checkable: false
             id: battery_charger_button
             styles: control
             widgets:
@@ -311,7 +311,7 @@ lvgl:
                   align: bottom_left
                   id: battery_charger_label
                   text: "Lampe couloir"
-            on_click:
+            on_press:
               - homeassistant.service:
                   service: switch.toggle
                   data:
@@ -336,7 +336,7 @@ lvgl:
             widgets:
               - label:
                   id: selected_light_title
-                  text: "TEST PANNEAU"
+                  text: "Aucune sélection"
                   text_color: 0xFFFFFF
 
               - button:
@@ -345,10 +345,7 @@ lvgl:
                   width: 100%
                   styles: control
                   on_press:
-                    - homeassistant.service:
-                        service: light.toggle
-                        data:
-                          entity_id: light.ampoule_bureau
+                    - script.execute: toggle_selected_light
                   widgets:
                     - label:
                         id: selected_light_toggle_label
@@ -377,11 +374,9 @@ lvgl:
                         width: 70
                         styles: control
                         on_press:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: light.ampoule_bureau
-                                brightness_pct: "25"
+                          - script.execute:
+                              id: set_selected_light_brightness
+                              brightness_pct: 25
                         widgets:
                           - label:
                               text: "25%"
@@ -393,11 +388,9 @@ lvgl:
                         width: 70
                         styles: control
                         on_press:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: light.ampoule_bureau
-                                brightness_pct: "50"
+                          - script.execute:
+                              id: set_selected_light_brightness
+                              brightness_pct: 50
                         widgets:
                           - label:
                               text: "50%"
@@ -409,11 +402,9 @@ lvgl:
                         width: 70
                         styles: control
                         on_press:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: light.ampoule_bureau
-                                brightness_pct: "100"
+                          - script.execute:
+                              id: set_selected_light_brightness
+                              brightness_pct: 100
                         widgets:
                           - label:
                               text: "100%"

@@ -1,3 +1,52 @@
+globals:
+  - id: selected_light
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: selected_light_name
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: selected_light_is_dimmable
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: selected_light_is_switch
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: selected_light_valid
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+script:
+  - id: toggle_selected_light
+    then:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid);'
+          then:
+            - homeassistant.service:
+                service: !lambda |-
+                  return id(selected_light_is_switch) ? "switch.toggle" : "light.toggle";
+                data:
+                  entity_id: !lambda 'return id(selected_light);'
+
+  - id: set_selected_light_brightness
+    parameters:
+      brightness_pct: int
+    then:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
+          then:
+            - homeassistant.service:
+                service: light.turn_on
+                data:
+                  entity_id: !lambda 'return id(selected_light);'
+                  brightness_pct: !lambda 'return brightness_pct;'
+
 binary_sensor:
   # Bureau
   - platform: homeassistant
@@ -5,10 +54,17 @@ binary_sensor:
     entity_id: light.ampoule_bureau
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_scene_features_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_scene_features_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_scene_features_button
+                bg_color: 0x313131
 
   # Fado bureau
   - platform: homeassistant
@@ -16,10 +72,17 @@ binary_sensor:
     entity_id: light.0x001788010dc8ba13
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_scene_calls_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_scene_calls_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_scene_calls_button
+                bg_color: 0x313131
 
   # Chambre
   - platform: homeassistant
@@ -27,10 +90,17 @@ binary_sensor:
     entity_id: light.0x001788010c014263
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_scene_evening_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_scene_evening_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_scene_evening_button
+                bg_color: 0x313131
 
   # Led chambre
   - platform: homeassistant
@@ -38,10 +108,17 @@ binary_sensor:
     entity_id: light.0x001788010c58b8f2
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_scene_dimmed_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_scene_dimmed_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_scene_dimmed_button
+                bg_color: 0x313131
 
   # Salon
   - platform: homeassistant
@@ -49,10 +126,17 @@ binary_sensor:
     entity_id: light.0x00178801062d1c11
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_blind_open_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_blind_open_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_blind_open_button
+                bg_color: 0x313131
 
   # Salle à manger
   - platform: homeassistant
@@ -60,10 +144,17 @@ binary_sensor:
     entity_id: light.0x001788010dc8c061
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_blind_66_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_blind_66_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_blind_66_button
+                bg_color: 0x313131
 
   # La boule
   - platform: homeassistant
@@ -71,10 +162,17 @@ binary_sensor:
     entity_id: light.la_boule
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_blind_33_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_blind_33_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_blind_33_button
+                bg_color: 0x313131
 
   # Salle de bain
   - platform: homeassistant
@@ -82,10 +180,17 @@ binary_sensor:
     entity_id: light.0x001788010c0adbc8
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_blind_close_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_blind_close_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_blind_close_button
+                bg_color: 0x313131
 
   # Cuisine
   - platform: homeassistant
@@ -93,10 +198,17 @@ binary_sensor:
     entity_id: light.0x001788010c2dee03
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: printer_power_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: printer_power_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: printer_power_button
+                bg_color: 0x313131
 
   # Led cuisine
   - platform: homeassistant
@@ -104,10 +216,17 @@ binary_sensor:
     entity_id: light.0x001788010d0b3aa9
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: filament_heater_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: filament_heater_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: filament_heater_button
+                bg_color: 0x313131
 
   # Couloir
   - platform: homeassistant
@@ -115,10 +234,17 @@ binary_sensor:
     entity_id: light.0x001788010c2de07e
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: office_aircon_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: office_aircon_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: office_aircon_button
+                bg_color: 0x313131
 
   # Lampe couloir (prise)
   - platform: homeassistant
@@ -126,10 +252,17 @@ binary_sensor:
     entity_id: switch.lampe_couloir
     trigger_on_initial_state: true
     on_state:
-      - lvgl.widget.update:
-          id: battery_charger_button
-          state:
-            checked: !lambda 'return x;'
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lvgl.widget.update:
+                id: battery_charger_button
+                bg_color: 0xFF8C00
+          else:
+            - lvgl.widget.update:
+                id: battery_charger_button
+                bg_color: 0x313131
 
 
 sensor:
