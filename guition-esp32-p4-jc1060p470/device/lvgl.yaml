@@ -336,7 +336,7 @@ lvgl:
             widgets:
               - label:
                   id: selected_light_title
-                  text: "TEST PANNEAU"
+                  text: "Aucune sélection"
                   text_color: 0xFFFFFF
 
               - button:
