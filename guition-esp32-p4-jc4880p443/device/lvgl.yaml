@@ -62,7 +62,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: scene_features_label
-                  text: "Features"
+                  text: "Ambiance"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -85,7 +85,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: office_scene_calls_label
-                  text: "Calls"
+                  text: "Appels"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -108,7 +108,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: office_scene_evening_label
-                  text: "Evening"
+                  text: "Soirée"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -131,7 +131,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: office_scene_dimmed_label
-                  text: "Dimmed"
+                  text: "Tamisé"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -152,7 +152,7 @@ lvgl:
                   text: $blinds_open
               - label:
                   align: bottom_left
-                  text: "Open"
+                  text: "Ouvert"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -174,7 +174,7 @@ lvgl:
                   text: $blinds_open
               - label:
                   align: bottom_left
-                  text: "Semi Open"
+                  text: "Mi-ouvert"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -196,7 +196,7 @@ lvgl:
                   text: $blinds_open
               - label:
                   align: bottom_left
-                  text: "Semi Closed"
+                  text: "Mi-fermé"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -218,7 +218,7 @@ lvgl:
                   text: $blinds_closed
               - label:
                   align: bottom_left
-                  text: "Close"
+                  text: "Fermé"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -269,7 +269,7 @@ lvgl:
                         pad_bottom: 6
               - label:
                   align: bottom_left
-                  text: "Printer"
+                  text: "Imprimante"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -319,7 +319,7 @@ lvgl:
                         pad_left: -4
               - label:
                   align: bottom_left
-                  text: "Dryer"
+                  text: "Séchoir"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -340,7 +340,7 @@ lvgl:
                   text: $aircon
               - label:
                   align: bottom_left
-                  text: "Aircon"
+                  text: "Clim"
             on_click:
               - homeassistant.service:
                   service: script.office_air_conditioner
@@ -361,7 +361,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: battery_charger_label
-                  text: "Charger"
+                  text: "Chargeur"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -384,7 +384,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: storage_lights_label
-                  text: "Storage"
+                  text: "Stockage"
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -407,7 +407,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: network_rack_label
-                  text: "Rack"
+                  text: "Rack réseau"
             on_click:
               - homeassistant.service:
                   service: light.toggle

@@ -352,7 +352,7 @@ lvgl:
                   widgets:
                     - label:
                         id: selected_light_toggle_label
-                        text: "ON / OFF"
+                        text: "Allumer / Éteindre"
                         align: center
 
               - label:

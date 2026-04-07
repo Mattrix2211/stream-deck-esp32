@@ -1,63 +1,64 @@
 # =============================================================================
-# SENSORS - Home Assistant State Synchronization
+# CAPTEURS - Synchronisation des états Home Assistant
 # =============================================================================
-# This file creates sensors that monitor Home Assistant entities and update
-# the touchscreen buttons to reflect the current state of your smart devices.
+# Ce fichier crée des capteurs qui surveillent les entités Home Assistant et
+# mettent à jour les boutons de l'écran tactile pour refléter l'état actuel
+# de vos appareils domotiques.
 #
-# WHY THIS FILE EXISTS:
-# When you press a button on the touchscreen, it sends a command to Home
-# Assistant. But what if someone turns on a light using their phone, or a
-# scene activates automatically? This file ensures the touchscreen display
-# always shows the ACTUAL state of each device, not just what was last pressed.
+# POURQUOI CE FICHIER EXISTE :
+# Quand vous appuyez sur un bouton de l'écran tactile, il envoie une commande
+# à Home Assistant. Mais si quelqu'un allume une lumière depuis son téléphone,
+# ou qu'une scène s'active automatiquement ? Ce fichier garantit que l'écran
+# affiche toujours l'état RÉEL de chaque appareil, pas juste le dernier appui.
 #
-# HOW IT WORKS:
-# 1. Each sensor subscribes to a Home Assistant entity (switch, sensor, etc.)
-# 2. When that entity's state changes, the "on_state" or "on_value" trigger fires
-# 3. The trigger updates the corresponding button in lvgl.yaml to show the new state
+# FONCTIONNEMENT :
+# 1. Chaque capteur s'abonne à une entité Home Assistant (switch, sensor, etc.)
+# 2. Quand l'état de cette entité change, le déclencheur "on_state" ou "on_value" s'active
+# 3. Le déclencheur met à jour le bouton correspondant dans lvgl.yaml pour afficher le nouvel état
 #
-# KEY CONCEPTS:
-# - "platform: homeassistant" = reads state directly from Home Assistant
-# - "platform: template" = calculates a value using code (lambda)
-# - "entity_id:" = the Home Assistant device/entity to monitor
-# - "id:" = unique name to reference this sensor elsewhere in ESPHome
-# - "trigger_on_initial_state: true" = update button immediately when device boots
-# - "lvgl.widget.update" = changes how a button looks on screen
-# - "checked: !lambda return x;" = x is the sensor's boolean state (true/false)
+# CONCEPTS CLÉS :
+# - "platform: homeassistant" = lit l'état directement depuis Home Assistant
+# - "platform: template" = calcule une valeur via du code (lambda)
+# - "entity_id:" = l'appareil/entité Home Assistant à surveiller
+# - "id:" = nom unique pour référencer ce capteur ailleurs dans ESPHome
+# - "trigger_on_initial_state: true" = met à jour le bouton dès le démarrage
+# - "lvgl.widget.update" = change l'apparence d'un bouton à l'écran
+# - "checked: !lambda return x;" = x est l'état booléen du capteur (true/false)
 #
-# RELATIONSHIP TO lvgl.yaml:
-# Each sensor here has a matching button in lvgl.yaml:
-#   - This file READS state from Home Assistant → updates button appearance
-#   - lvgl.yaml SENDS commands to Home Assistant → when button is pressed
+# RELATION AVEC lvgl.yaml :
+# Chaque capteur ici a un bouton correspondant dans lvgl.yaml :
+#   - Ce fichier LIT l'état depuis Home Assistant → met à jour l'apparence du bouton
+#   - lvgl.yaml ENVOIE des commandes à Home Assistant → quand le bouton est pressé
 # =============================================================================
 
 
 # =============================================================================
-# REGULAR SENSORS (Numeric Values)
+# CAPTEURS NUMÉRIQUES
 # =============================================================================
-# These sensors read numeric values like temperature and position.
-# They're used to display information or calculate other states.
+# Ces capteurs lisent des valeurs numériques comme la température et la position.
+# Ils servent à afficher des informations ou calculer d'autres états.
 # =============================================================================
 
 sensor:
 
   # ===========================================================================
-  # SENSOR: Office Temperature (Indoor)
+  # CAPTEUR : Température bureau (intérieur)
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   The temperature inside the office from sensor.office_temperature
-  #   (This could be from a smart thermostat, dedicated sensor, etc.)
+  # CE QU'IL SURVEILLE :
+  #   La température intérieure du bureau depuis sensor.office_temperature
+  #   (Peut provenir d'un thermostat connecté, d'un capteur dédié, etc.)
   #
-  # WHAT IT UPDATES:
-  #   The "temperatures" label in the top-left corner of the screen
-  #   Format: "outdoor° / indoor°" (e.g., "15° / 22°")
+  # CE QU'IL MET À JOUR :
+  #   Le label "temperatures" en haut à gauche de l'écran
+  #   Format : "extérieur° / intérieur°" (ex. : "15° / 22°")
   #
-  # HOW IT WORKS:
-  #   When the office temperature changes in Home Assistant, this sensor
-  #   receives the new value and updates the label text. It combines the
-  #   outdoor temperature (from the other sensor below) with this value.
+  # FONCTIONNEMENT :
+  #   Quand la température du bureau change dans Home Assistant, ce capteur
+  #   reçoit la nouvelle valeur et met à jour le texte du label. Il combine
+  #   la température extérieure (de l'autre capteur ci-dessous) avec cette valeur.
   #
-  # RELATED UI ELEMENT:
-  #   lvgl.yaml → temperatures label (id: temperatures)
+  # ÉLÉMENT UI ASSOCIÉ :
+  #   lvgl.yaml → label temperatures (id: temperatures)
   # ===========================================================================
   - platform: homeassistant
     entity_id: sensor.office_temperature
@@ -70,26 +71,26 @@ sensor:
             args: [ '(int)round(id(outdoor_temperature).state)', '(int)round(x)' ]
 
   # ===========================================================================
-  # SENSOR: Outdoor Temperature
+  # CAPTEUR : Température extérieure
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   The temperature outside from sensor.outdoor_temperature
-  #   (This could be from a weather service, outdoor sensor, etc.)
+  # CE QU'IL SURVEILLE :
+  #   La température extérieure depuis sensor.outdoor_temperature
+  #   (Peut provenir d'un service météo, d'un capteur extérieur, etc.)
   #
-  # WHAT IT UPDATES:
-  #   The "temperatures" label in the top-left corner of the screen
-  #   Format: "outdoor° / indoor°" (e.g., "15° / 22°")
+  # CE QU'IL MET À JOUR :
+  #   Le label "temperatures" en haut à gauche de l'écran
+  #   Format : "extérieur° / intérieur°" (ex. : "15° / 22°")
   #
-  # HOW IT WORKS:
-  #   When the outdoor temperature changes in Home Assistant, this sensor
-  #   receives the new value and updates the label text. It combines this
-  #   value with the office temperature (from the sensor above).
+  # FONCTIONNEMENT :
+  #   Quand la température extérieure change dans Home Assistant, ce capteur
+  #   reçoit la nouvelle valeur et met à jour le texte du label. Il combine
+  #   cette valeur avec la température du bureau (du capteur ci-dessus).
   #
-  # NOTE: Both temperature sensors update the same label. Either one changing
-  #       will refresh the display with both current values.
+  # REMARQUE : Les deux capteurs de température mettent à jour le même label.
+  #            L'un ou l'autre qui change actualisera l'affichage avec les deux valeurs.
   #
-  # RELATED UI ELEMENT:
-  #   lvgl.yaml → temperatures label (id: temperatures)
+  # ÉLÉMENT UI ASSOCIÉ :
+  #   lvgl.yaml → label temperatures (id: temperatures)
   # ===========================================================================
   - platform: homeassistant
     entity_id: sensor.outdoor_temperature
@@ -102,24 +103,24 @@ sensor:
             args: [ '(int)round(x)', '(int)round(id(office_temperature).state)' ]
 
   # ===========================================================================
-  # SENSOR: Office Blind Position
+  # CAPTEUR : Position volet bureau
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   The current position of the office window blind (0-100%)
-  #   Reads the "current_position" attribute from cover.office_blind
+  # CE QU'IL SURVEILLE :
+  #   La position actuelle du volet de la fenêtre du bureau (0-100%)
+  #   Lit l'attribut "current_position" depuis cover.office_blind
   #
-  # WHAT IT'S USED FOR:
-  #   This sensor doesn't directly update buttons. Instead, it provides
-  #   the position value that the template sensors below use to determine
-  #   which blind button should be highlighted.
+  # UTILISATION :
+  #   Ce capteur ne met pas à jour les boutons directement. Il fournit
+  #   la valeur de position que les capteurs template ci-dessous utilisent
+  #   pour déterminer quel bouton de volet doit être mis en évidence.
   #
-  # WHY IT'S SEPARATE:
-  #   The blind has 4 preset buttons (0%, 33%, 66%, 100%), but the blind
-  #   could be at ANY position. This sensor stores the actual position,
-  #   and the template sensors below check if it's "close enough" to each
-  #   preset (within 3%) to highlight that button.
+  # POURQUOI SÉPARÉ :
+  #   Le volet a 4 boutons préréglés (0%, 33%, 66%, 100%), mais le volet
+  #   peut être à N'IMPORTE QUELLE position. Ce capteur stocke la position
+  #   réelle, et les capteurs template vérifient si elle est "assez proche"
+  #   de chaque préréglage (à 3% près) pour mettre en évidence ce bouton.
   #
-  # RELATED UI ELEMENTS:
+  # ÉLÉMENTS UI ASSOCIÉS :
   #   lvgl.yaml → office_blind_open_button, office_blind_66_button,
   #               office_blind_33_button, office_blind_close_button
   # ===========================================================================
@@ -129,16 +130,16 @@ sensor:
     attribute: current_position
 
   # ===========================================================================
-  # SENSOR: Aircon Current Temperature
+  # CAPTEUR : Température actuelle climatiseur
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Current temperature reported by the air conditioner
-  #   Watches: climate.office_air_conditioner (current_temperature)
+  # CE QU'IL SURVEILLE :
+  #   Température actuelle rapportée par le climatiseur
+  #   Surveille : climate.office_air_conditioner (current_temperature)
   #
-  # WHAT IT UPDATES:
-  #   The temperature label inside the Aircon Temp button
+  # CE QU'IL MET À JOUR :
+  #   Le label de température dans le bouton Clim Temp
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → aircon_temp_label
   # ===========================================================================
   - platform: homeassistant
@@ -156,16 +157,16 @@ sensor:
           value: !lambda return (int)x;
 
   # ===========================================================================
-  # SENSOR: Aircon Target Temperature
+  # CAPTEUR : Température cible climatiseur
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Target/set temperature reported by the air conditioner
-  #   Watches: climate.office_air_conditioner (temperature)
+  # CE QU'IL SURVEILLE :
+  #   Température cible/consigne rapportée par le climatiseur
+  #   Surveille : climate.office_air_conditioner (temperature)
   #
-  # WHAT IT UPDATES:
-  #   The set temperature label inside the Aircon Set Temp button
+  # CE QU'IL MET À JOUR :
+  #   Le label de consigne dans le bouton Clim Consigne
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → aircon_set_temp_label
   # ===========================================================================
   - platform: homeassistant
@@ -188,16 +189,16 @@ sensor:
           value: !lambda return (int)x;
 
   # ===========================================================================
-  # SENSOR: Heating Current Temperature
+  # CAPTEUR : Température actuelle chauffage
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Current temperature reported by the heating thermostat
-  #   Watches: climate.office_radiator_thermostat (current_temperature)
+  # CE QU'IL SURVEILLE :
+  #   Température actuelle rapportée par le thermostat de chauffage
+  #   Surveille : climate.office_radiator_thermostat (current_temperature)
   #
-  # WHAT IT UPDATES:
-  #   The current temperature label and arc on the heating lab page
+  # CE QU'IL MET À JOUR :
+  #   Le label de température actuelle et l'arc sur la page chauffage détaillée
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → heating_lab_current_label, heating_current_arc
   # ===========================================================================
   - platform: homeassistant
@@ -237,16 +238,16 @@ sensor:
             return cur_v < tgt_v ? cur_v : tgt_v;
 
   # ===========================================================================
-  # SENSOR: Heating Target Temperature
+  # CAPTEUR : Température cible chauffage
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Target/set temperature reported by the heating thermostat
-  #   Watches: climate.office_radiator_thermostat (temperature)
+  # CE QU'IL SURVEILLE :
+  #   Température cible/consigne rapportée par le thermostat de chauffage
+  #   Surveille : climate.office_radiator_thermostat (temperature)
   #
-  # WHAT IT UPDATES:
-  #   The target temperature label and arc on the heating lab page
+  # CE QU'IL MET À JOUR :
+  #   Le label de température cible et l'arc sur la page chauffage détaillée
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → heating_lab_target_label, heating_target_arc
   # ===========================================================================
   - platform: homeassistant
@@ -289,21 +290,21 @@ sensor:
             return cur_v < tgt_v ? cur_v : tgt_v;
 
 # =============================================================================
-# TEXT SENSORS (String Values)
+# CAPTEURS TEXTE (Valeurs chaînes de caractères)
 # =============================================================================
 
 text_sensor:
   # ===========================================================================
-  # SENSOR: Heating HVAC Action
+  # CAPTEUR : Action HVAC chauffage
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Current action reported by the heating thermostat (heating/off/idle)
-  #   Watches: climate.office_radiator_thermostat (hvac_action)
+  # CE QU'IL SURVEILLE :
+  #   Action actuelle rapportée par le thermostat de chauffage (heating/off/idle)
+  #   Surveille : climate.office_radiator_thermostat (hvac_action)
   #
-  # WHAT IT UPDATES:
-  #   The mode label on the heating lab page
+  # CE QU'IL MET À JOUR :
+  #   Le label de mode sur la page chauffage détaillée
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → heating_lab_mode_label
   # ===========================================================================
   - platform: homeassistant
@@ -314,22 +315,22 @@ text_sensor:
       - lvgl.label.update:
           id: heating_lab_mode_label
           text: !lambda |-
-            if (x == "heating") return "Heating";
-            if (x == "idle") return "Idle";
-            if (x == "off") return "Off";
+            if (x == "heating") return "Chauffe";
+            if (x == "idle") return "Veille";
+            if (x == "off") return "Éteint";
             return x.c_str();
 
   # ===========================================================================
-  # SENSOR: Centauri Carbon Print Progress
+  # CAPTEUR : Progression d'impression Centauri Carbon
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Current print progress percent from Home Assistant
-  #   Watches: sensor.centauri_carbon_percent_complete_helper
+  # CE QU'IL SURVEILLE :
+  #   Pourcentage de progression d'impression actuel depuis Home Assistant
+  #   Surveille : sensor.centauri_carbon_percent_complete_helper
   #
-  # WHAT IT UPDATES:
-  #   The print progress label inside the "Printer" button
+  # CE QU'IL MET À JOUR :
+  #   Le label de progression dans le bouton "Imprimante"
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → print_progress_label
   # ===========================================================================
   - platform: homeassistant
@@ -343,16 +344,16 @@ text_sensor:
             args: [ 'x' ]
 
   # ===========================================================================
-  # SENSOR: Filament Heater Humidity
+  # CAPTEUR : Humidité séchoir à filament
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Current humidity percent from the filament dryer sensor
-  #   Watches: sensor.office_filament_heater_sensor_humidity
+  # CE QU'IL SURVEILLE :
+  #   Pourcentage d'humidité actuel du capteur du séchoir à filament
+  #   Surveille : sensor.office_filament_heater_sensor_humidity
   #
-  # WHAT IT UPDATES:
-  #   The humidity label inside the "Dryer" button
+  # CE QU'IL MET À JOUR :
+  #   Le label d'humidité dans le bouton "Séchoir"
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → dryer_humidity_label
   # ===========================================================================
   - platform: homeassistant
@@ -368,32 +369,31 @@ text_sensor:
 
 
 # =============================================================================
-# BINARY SENSORS (On/Off States)
+# CAPTEURS BINAIRES (États On/Off)
 # =============================================================================
-# These sensors track on/off states and update button appearances.
-# When the sensor is ON (true), the button shows as "checked" (highlighted).
-# When the sensor is OFF (false), the button shows as unchecked (dimmed).
+# Ces capteurs suivent les états on/off et mettent à jour l'apparence des boutons.
+# Quand le capteur est ON (true), le bouton s'affiche "coché" (mis en évidence).
+# Quand le capteur est OFF (false), le bouton s'affiche décoché (atténué).
 # =============================================================================
 
 binary_sensor:
 
   # ===========================================================================
-  # SENSOR: Office Evening Scene Active
+  # CAPTEUR : Scène Soirée bureau active
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the "Evening" lighting scene is currently active
-  #   Watches: switch.office_evening_stateful_scene in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si la scène d'éclairage "Soirée" est actuellement active
+  #   Surveille : switch.office_evening_stateful_scene dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Evening" button's visual state (highlighted when active)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Soirée" (mis en évidence quand actif)
   #
-  # HOW IT WORKS:
-  #   Home Assistant has a binary sensor that's ON when the evening scene
-  #   is active. When this changes, the button appearance updates to match.
-  #   "trigger_on_initial_state: true" ensures the button shows correctly
-  #   right when the device boots up, not just when state changes later.
+  # FONCTIONNEMENT :
+  #   Home Assistant a un capteur binaire qui est ON quand la scène soirée
+  #   est active. Quand cela change, l'apparence du bouton se met à jour.
+  #   "trigger_on_initial_state: true" assure l'affichage correct dès le démarrage.
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_scene_evening_button
   # ===========================================================================
   - platform: homeassistant
@@ -408,16 +408,16 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: Office Dimmed Scene Active
+  # CAPTEUR : Scène Tamisée bureau active
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the "Dimmed" lighting scene is currently active
-  #   Watches: switch.office_dimmed_stateful_scene in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si la scène d'éclairage "Tamisée" est actuellement active
+  #   Surveille : switch.office_dimmed_stateful_scene dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Dimmed" button's visual state (highlighted when active)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Tamisé" (mis en évidence quand actif)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_scene_dimmed_button
   # ===========================================================================
   - platform: homeassistant
@@ -432,16 +432,16 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: Office Calls Scene Active
+  # CAPTEUR : Scène Appels bureau active
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the "Calls" (video call) lighting scene is currently active
-  #   Watches: switch.office_calls_stateful_scene in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si la scène d'éclairage "Appels" (visioconférence) est actuellement active
+  #   Surveille : switch.office_calls_stateful_scene dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Calls" button's visual state (highlighted when active)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Appels" (mis en évidence quand actif)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_scene_calls_button
   # ===========================================================================
   - platform: homeassistant
@@ -456,16 +456,16 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: Office Features Scene Active
+  # CAPTEUR : Scène Ambiance bureau active
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the "Features" (LED accent) lighting scene is currently active
-  #   Watches: switch.office_features_stateful_scene in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si la scène d'éclairage "Ambiance" (ruban LED) est actuellement active
+  #   Surveille : switch.office_features_stateful_scene dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Features" button's visual state (highlighted when active)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Ambiance" (mis en évidence quand actif)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_scene_features_button
   # ===========================================================================
   - platform: homeassistant
@@ -480,19 +480,19 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: 3D Printer Power State
+  # CAPTEUR : État alimentation imprimante 3D
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the 3D printer's smart plug is turned on or off
-  #   Watches: switch.office_3d_printer_power in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si la prise connectée de l'imprimante 3D est allumée ou éteinte
+  #   Surveille : switch.office_3d_printer_power dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Printer" button's visual state (highlighted when powered on)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Imprimante" (mis en évidence quand allumé)
   #
-  # NOTE: This monitors a "switch" entity but uses binary_sensor platform.
-  #       ESPHome treats the switch's on/off state as a binary value here.
+  # REMARQUE : Surveille une entité "switch" mais utilise la plateforme binary_sensor.
+  #            ESPHome traite l'état on/off du switch comme une valeur binaire ici.
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → printer_power_button
   # ===========================================================================
   - platform: homeassistant
@@ -513,16 +513,16 @@ binary_sensor:
             hidden: !lambda return !x;
 
   # ===========================================================================
-  # SENSOR: Air Conditioner State
+  # CAPTEUR : État climatiseur
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the office air conditioner is running
-  #   Watches: switch.office_air_conditioner in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si le climatiseur du bureau est en marche
+  #   Surveille : switch.office_air_conditioner dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Aircon" button's visual state (highlighted when running)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Clim" (mis en évidence quand en marche)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_aircon_button
   # ===========================================================================
   - platform: homeassistant
@@ -554,19 +554,19 @@ binary_sensor:
             hidden: !lambda return !x;
 
   # ===========================================================================
-  # SENSOR: Battery Charger State
+  # CAPTEUR : État chargeur de batteries
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the battery charger's smart plug is turned on or off
-  #   Watches: switch.d4c5 in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si la prise connectée du chargeur de batteries est allumée ou éteinte
+  #   Surveille : switch.d4c5 dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Charger" button's visual state (highlighted when powered on)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Chargeur" (mis en évidence quand allumé)
   #
-  # NOTE: "d4c5" is the device's default identifier. Consider renaming this
-  #       in Home Assistant to something clearer like "switch.office_charger"
+  # REMARQUE : "d4c5" est l'identifiant par défaut de l'appareil. Envisager de le
+  #            renommer dans Home Assistant en quelque chose de plus clair comme "switch.office_charger"
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → battery_charger_button
   # ===========================================================================
   - platform: homeassistant
@@ -581,19 +581,19 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: Filament Dryer State
+  # CAPTEUR : État séchoir à filament
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the filament dryer/heater is turned on or off
-  #   Watches: switch.office_filament_heater_893b in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si le séchoir/chauffoir à filament est allumé ou éteint
+  #   Surveille : switch.office_filament_heater_893b dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Dryer" button's visual state (highlighted when running)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Séchoir" (mis en évidence quand en marche)
   #
-  # NOTE: The filament dryer removes moisture from 3D printer filament.
-  #       Dry filament produces better quality prints.
+  # REMARQUE : Le séchoir à filament retire l'humidité du filament d'imprimante 3D.
+  #            Un filament sec produit des impressions de meilleure qualité.
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → filament_heater_button
   # ===========================================================================
   - platform: homeassistant
@@ -614,26 +614,26 @@ binary_sensor:
             hidden: !lambda return !x;
 
   # ===========================================================================
-  # TEMPLATE SENSOR: Blind at 100% (Fully Open)
+  # CAPTEUR TEMPLATE : Volet à 100% (totalement ouvert)
   # ===========================================================================
-  # WHAT IT DOES:
-  #   Calculates whether the blind is at (or very close to) 100% open
-  #   Returns TRUE if position is within 3% of 100, FALSE otherwise
+  # RÔLE :
+  #   Calcule si le volet est à (ou très proche de) 100% d'ouverture
+  #   Retourne VRAI si la position est à moins de 3% de 100, FAUX sinon
   #
-  # WHY USE A TEMPLATE:
-  #   The blind motor may not stop at exactly 100%. It might be 99% or 101%.
-  #   This template uses a 3% tolerance to account for this imprecision.
-  #   If position is between 97-100%, we consider it "fully open".
+  # POURQUOI UN TEMPLATE :
+  #   Le moteur du volet peut ne pas s'arrêter exactement à 100% (99% ou 101%).
+  #   Ce template utilise une tolérance de 3% pour tenir compte de cette imprécision.
+  #   Si la position est entre 97-100%, on considère le volet "totalement ouvert".
   #
-  # HOW THE CODE WORKS:
-  #   1. Check if office_blind_position has received a value yet
-  #   2. Calculate: |current_position - 100| <= 3
-  #   3. Return true if within range, false otherwise
+  # FONCTIONNEMENT DU CODE :
+  #   1. Vérifie si office_blind_position a reçu une valeur
+  #   2. Calcule : |position_actuelle - 100| <= 3
+  #   3. Retourne vrai si dans la plage, faux sinon
   #
-  # WHAT IT UPDATES:
-  #   The "Open" button's visual state (highlighted when blind is ~100%)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Ouvert" (mis en évidence quand volet ~100%)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_blind_open_button
   # ===========================================================================
   - platform: template
@@ -651,19 +651,19 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # TEMPLATE SENSOR: Blind at 66% (Semi Open)
+  # CAPTEUR TEMPLATE : Volet à 66% (mi-ouvert)
   # ===========================================================================
-  # WHAT IT DOES:
-  #   Calculates whether the blind is at (or very close to) 66% open
-  #   Returns TRUE if position is within 3% of 66, FALSE otherwise
+  # RÔLE :
+  #   Calcule si le volet est à (ou très proche de) 66% d'ouverture
+  #   Retourne VRAI si la position est à moins de 3% de 66, FAUX sinon
   #
-  # HOW THE CODE WORKS:
-  #   Same logic as above, but checks for 66% (range: 63-69%)
+  # FONCTIONNEMENT DU CODE :
+  #   Même logique que ci-dessus, mais vérifie 66% (plage : 63-69%)
   #
-  # WHAT IT UPDATES:
-  #   The "Semi Open" button's visual state (highlighted when blind is ~66%)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Mi-ouvert" (mis en évidence quand volet ~66%)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_blind_66_button
   # ===========================================================================
   - platform: template
@@ -681,19 +681,19 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # TEMPLATE SENSOR: Blind at 33% (Semi Closed)
+  # CAPTEUR TEMPLATE : Volet à 33% (mi-fermé)
   # ===========================================================================
-  # WHAT IT DOES:
-  #   Calculates whether the blind is at (or very close to) 33% open
-  #   Returns TRUE if position is within 3% of 33, FALSE otherwise
+  # RÔLE :
+  #   Calcule si le volet est à (ou très proche de) 33% d'ouverture
+  #   Retourne VRAI si la position est à moins de 3% de 33, FAUX sinon
   #
-  # HOW THE CODE WORKS:
-  #   Same logic as above, but checks for 33% (range: 30-36%)
+  # FONCTIONNEMENT DU CODE :
+  #   Même logique que ci-dessus, mais vérifie 33% (plage : 30-36%)
   #
-  # WHAT IT UPDATES:
-  #   The "Semi Closed" button's visual state (highlighted when blind is ~33%)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Mi-fermé" (mis en évidence quand volet ~33%)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_blind_33_button
   # ===========================================================================
   - platform: template
@@ -711,19 +711,19 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # TEMPLATE SENSOR: Blind at 0% (Fully Closed)
+  # CAPTEUR TEMPLATE : Volet à 0% (totalement fermé)
   # ===========================================================================
-  # WHAT IT DOES:
-  #   Calculates whether the blind is at (or very close to) 0% (closed)
-  #   Returns TRUE if position is within 3% of 0, FALSE otherwise
+  # RÔLE :
+  #   Calcule si le volet est à (ou très proche de) 0% (fermé)
+  #   Retourne VRAI si la position est à moins de 3% de 0, FAUX sinon
   #
-  # HOW THE CODE WORKS:
-  #   Same logic as above, but checks for 0% (range: 0-3%)
+  # FONCTIONNEMENT DU CODE :
+  #   Même logique que ci-dessus, mais vérifie 0% (plage : 0-3%)
   #
-  # WHAT IT UPDATES:
-  #   The "Close" button's visual state (highlighted when blind is ~0%)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Fermé" (mis en évidence quand volet ~0%)
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → office_blind_close_button
   # ===========================================================================
   - platform: template
@@ -741,20 +741,20 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: Office Storage Lights State
+  # CAPTEUR : État lumières rangement bureau
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the office storage area lights are on or off
-  #   Watches: light.office_storage in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si les lumières de la zone de rangement du bureau sont allumées ou éteintes
+  #   Surveille : light.office_storage dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Storage Lights" button's visual state (highlighted when on)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Stockage" (mis en évidence quand allumé)
   #
-  # NOTE: This sensor references a button (storage_lights_button) that
-  #       should be defined in lvgl.yaml. If the button doesn't exist,
-  #       add it there or remove this sensor.
+  # REMARQUE : Ce capteur référence un bouton (storage_lights_button) qui
+  #            doit être défini dans lvgl.yaml. S'il n'existe pas, l'ajouter
+  #            ou supprimer ce capteur.
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → storage_lights_button
   # ===========================================================================
   - platform: homeassistant
@@ -769,20 +769,20 @@ binary_sensor:
             checked: !lambda return x;
 
   # ===========================================================================
-  # SENSOR: Network Rack Lights State
+  # CAPTEUR : État lumières rack réseau
   # ===========================================================================
-  # WHAT IT MONITORS:
-  #   Whether the network rack lights are on or off
-  #   Watches: light.office_network_rack in Home Assistant
+  # CE QU'IL SURVEILLE :
+  #   Si les lumières du rack réseau sont allumées ou éteintes
+  #   Surveille : light.office_network_rack dans Home Assistant
   #
-  # WHAT IT UPDATES:
-  #   The "Network Rack" button's visual state (highlighted when on)
+  # CE QU'IL MET À JOUR :
+  #   L'état visuel du bouton "Rack réseau" (mis en évidence quand allumé)
   #
-  # NOTE: This sensor references a button (network_rack_button) that
-  #       should be defined in lvgl.yaml. If the button doesn't exist,
-  #       add it there or remove this sensor.
+  # REMARQUE : Ce capteur référence un bouton (network_rack_button) qui
+  #            doit être défini dans lvgl.yaml. S'il n'existe pas, l'ajouter
+  #            ou supprimer ce capteur.
   #
-  # RELATED UI ELEMENT:
+  # ÉLÉMENT UI ASSOCIÉ :
   #   lvgl.yaml → network_rack_button
   # ===========================================================================
   - platform: homeassistant

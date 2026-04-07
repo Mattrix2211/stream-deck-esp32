@@ -1,20 +1,20 @@
 # =============================================================================
-# LVGL TOUCHSCREEN INTERFACE
+# INTERFACE TACTILE LVGL
 # =============================================================================
-# This file defines the graphical user interface (GUI) for the ESP32 touchscreen
-# display. It creates buttons that control smart home devices through Home Assistant.
+# Ce fichier définit l'interface graphique (GUI) pour l'écran tactile ESP32.
+# Il crée des boutons qui contrôlent les appareils domotiques via Home Assistant.
 #
-# HOW IT WORKS:
-# - Each button sends a command to Home Assistant when pressed (on_press/on_click)
-# - Buttons receive state updates from sensors defined in sensors.yaml
-# - When a sensor changes, the button's appearance updates (checked/unchecked)
+# FONCTIONNEMENT :
+# - Chaque bouton envoie une commande à Home Assistant quand il est pressé (on_press/on_click)
+# - Les boutons reçoivent les mises à jour d'état depuis les capteurs définis dans sensors.yaml
+# - Quand un capteur change, l'apparence du bouton se met à jour (coché/décoché)
 #
-# KEY CONCEPTS:
-# - "id:" is a unique name used to reference this element from other files
-# - "entity_id:" refers to a device/entity in Home Assistant
-# - "checkable: true" means the button shows on/off state visually
-# - "$variable" values (like $button_width) are defined in template.yaml
-# - Sensors in sensors.yaml watch Home Assistant and update button states
+# CONCEPTS CLÉS :
+# - "id:" est un nom unique pour référencer cet élément depuis d'autres fichiers
+# - "entity_id:" désigne un appareil/entité dans Home Assistant
+# - "checkable: true" signifie que le bouton affiche visuellement l'état on/off
+# - Les valeurs "$variable" (comme $button_width) sont définies dans template.yaml
+# - Les capteurs dans sensors.yaml surveillent Home Assistant et mettent à jour les boutons
 # =============================================================================
 
 lvgl:
@@ -23,19 +23,19 @@ lvgl:
     widgets:
     
       # =========================================================================
-      # TEMPERATURE DISPLAY (Top-left corner of screen)
+      # AFFICHAGE TEMPÉRATURE (coin supérieur gauche)
       # =========================================================================
-      # WHAT IT SHOWS:
-      #   Displays two temperatures: "outdoor° / indoor°"
-      #   Example: "15° / 22°" means 15°C outside, 22°C in the office
+      # CE QUE ÇA AFFICHE :
+      #   Affiche deux températures : "extérieur° / intérieur°"
+      #   Exemple : "15° / 22°" signifie 15°C dehors, 22°C dans le bureau
       #
-      # WHERE THE DATA COMES FROM (defined in sensors.yaml):
-      #   - Left number: sensor.outdoor_temperature (weather/outdoor sensor)
-      #   - Right number: sensor.office_temperature (indoor room sensor)
+      # SOURCE DES DONNÉES (définie dans sensors.yaml) :
+      #   - Chiffre de gauche : sensor.outdoor_temperature (capteur extérieur)
+      #   - Chiffre de droite : sensor.office_temperature (capteur intérieur)
       #
-      # HOW IT UPDATES:
-      #   When either temperature sensor changes in Home Assistant, the
-      #   sensors.yaml file triggers an update to this label's text.
+      # MISE À JOUR :
+      #   Quand l'un des capteurs de température change dans Home Assistant,
+      #   sensors.yaml déclenche une mise à jour du texte de ce label.
       # =========================================================================
       - label:
           text: "-° / -°"
@@ -47,14 +47,14 @@ lvgl:
           text_color: 0xFFFFFF
 
       # =========================================================================
-      # CLOCK DISPLAY (Top-center of screen)
+      # AFFICHAGE HORLOGE (centre haut de l'écran)
       # =========================================================================
-      # WHAT IT SHOWS:
-      #   Current time in 24-hour format (e.g., "14:30")
+      # CE QUE ÇA AFFICHE :
+      #   Heure actuelle au format 24h (ex. : "14:30")
       #
-      # WHERE THE DATA COMES FROM:
-      #   The time component (configured in addon/time.yaml) syncs with
-      #   Home Assistant's time and updates this label every minute.
+      # SOURCE DES DONNÉES :
+      #   Le composant time (configuré dans addon/time.yaml) se synchronise
+      #   avec l'heure de Home Assistant et met à jour ce label chaque minute.
       # =========================================================================
       - label:
           text: "--:--"
@@ -85,20 +85,20 @@ lvgl:
       widgets:
       
         # =========================================================================
-        # BUTTON: Features Scene
+        # BOUTON : Scène Ambiance
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Activates the "Features" lighting scene - a preset that turns on
-        #   LED strip accent lighting for a decorative effect.
+        # RÔLE :
+        #   Active la scène d'éclairage "Ambiance" - un preset qui allume
+        #   le ruban LED pour un effet décoratif.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_features_stateful_scene
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_features_stateful_scene
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_features_stateful_scene
-        #   When that sensor is ON, this button appears "checked" (highlighted)
-        #   When that sensor is OFF, this button appears unchecked (dimmed)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_features_stateful_scene
+        #   Quand ce capteur est ON, le bouton apparaît "coché" (mis en évidence)
+        #   Quand il est OFF, le bouton apparaît décoché (atténué)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -117,7 +117,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: scene_features_label
-                  text: "Features"
+                  text: "Ambiance"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -125,19 +125,19 @@ lvgl:
                     entity_id: switch.office_features_stateful_scene
 
         # =========================================================================
-        # BUTTON: Calls Scene
+        # BOUTON : Scène Appels
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Activates the "Calls" lighting scene - optimized lighting for
-        #   video calls (good front lighting, reduced background glare).
+        # RÔLE :
+        #   Active la scène d'éclairage "Appels" - éclairage optimisé pour
+        #   les visioconférences (bon éclairage frontal, moins de reflets).
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_calls_stateful_scene
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_calls_stateful_scene
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_calls_stateful_scene
-        #   When that sensor is ON, this button appears "checked" (highlighted)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_calls_stateful_scene
+        #   Quand ce capteur est ON, le bouton apparaît "coché" (mis en évidence)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -156,7 +156,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: office_scene_calls_label
-                  text: "Calls"
+                  text: "Appels"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -164,19 +164,19 @@ lvgl:
                     entity_id: switch.office_calls_stateful_scene
 
         # =========================================================================
-        # BUTTON: Evening Scene
+        # BOUTON : Scène Soirée
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Activates the "Evening" lighting scene - warm, ambient lighting
-        #   for relaxed evening use (lower brightness, warmer colors).
+        # RÔLE :
+        #   Active la scène d'éclairage "Soirée" - éclairage chaud et ambiant
+        #   pour une utilisation détendue en soirée (luminosité réduite, couleurs chaudes).
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_evening_stateful_scene
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_evening_stateful_scene
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_evening_stateful_scene
-        #   When that sensor is ON, this button appears "checked" (highlighted)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_evening_stateful_scene
+        #   Quand ce capteur est ON, le bouton apparaît "coché" (mis en évidence)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -195,7 +195,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: office_scene_evening_label
-                  text: "Evening"
+                  text: "Soirée"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -203,19 +203,19 @@ lvgl:
                     entity_id: switch.office_evening_stateful_scene
 
         # =========================================================================
-        # BUTTON: Dimmed Scene
+        # BOUTON : Scène Tamisée
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Activates the "Dimmed" lighting scene - very low light levels,
-        #   useful for watching movies or reducing eye strain at night.
+        # RÔLE :
+        #   Active la scène d'éclairage "Tamisée" - niveau de lumière très bas,
+        #   utile pour regarder des films ou réduire la fatigue oculaire la nuit.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_dimmed_stateful_scene
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_dimmed_stateful_scene
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_dimmed_stateful_scene
-        #   When that sensor is ON, this button appears "checked" (highlighted)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_dimmed_stateful_scene
+        #   Quand ce capteur est ON, le bouton apparaît "coché" (mis en évidence)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -234,7 +234,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: office_scene_dimmed_label
-                  text: "Dimmed"
+                  text: "Tamisé"
             on_press:
               - homeassistant.service:
                   service: switch.toggle
@@ -242,10 +242,10 @@ lvgl:
                     entity_id: switch.office_dimmed_stateful_scene
 
         # =========================================================================
-        # BUTTON: Blinds (Open Blind Controls Page)
+        # BOUTON : Volets (ouvre la page de contrôle des volets)
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Navigates to the dedicated blinds control page.
+        # RÔLE :
+        #   Navigue vers la page dédiée au contrôle des volets.
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -262,27 +262,27 @@ lvgl:
                   text: $blinds_closed
               - label:
                   align: bottom_left
-                  text: "Blinds"
+                  text: "Volets"
             on_click:
               - lvgl.page.show: blinds_page
 
 
         # =========================================================================
-        # BUTTON: 3D Printer Power
+        # BOUTON : Alimentation Imprimante 3D
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Turns the 3D printer's power outlet on or off.
-        #   This controls a smart plug that supplies power to the printer.
+        # RÔLE :
+        #   Allume ou éteint la prise de l'imprimante 3D.
+        #   Contrôle une prise connectée qui alimente l'imprimante.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_3d_printer_power
-        #   (Toggle means: if ON, turn OFF. If OFF, turn ON.)
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_3d_printer_power
+        #   (Toggle : si ON, passe à OFF. Si OFF, passe à ON.)
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_3d_printer_power
-        #   When the switch is ON, this button appears "checked" (highlighted)
-        #   When the switch is OFF, this button appears unchecked (dimmed)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_3d_printer_power
+        #   Quand la prise est ON, le bouton apparaît "coché" (mis en évidence)
+        #   Quand elle est OFF, le bouton apparaît décoché (atténué)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -293,13 +293,13 @@ lvgl:
             grid_cell_column_pos: 2
             grid_cell_row_pos: 1
             widgets:
-              # Icon (shown when OFF)
+              # Icône (affichée quand éteint)
               - label:
                   text_font: $icon_font
                   align: top_left
                   id: printer_power_icon
                   text: $printer
-              # Progress (shown when ON)
+              # Progression (affichée quand allumé)
               - obj:
                   align: top_left
                   id: print_progress_container
@@ -327,7 +327,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: printer_power_label
-                  text: "Printer"
+                  text: "Imprimante"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -335,22 +335,22 @@ lvgl:
                     entity_id: switch.office_3d_printer_power
 
         # =========================================================================
-        # BUTTON: Filament Dryer
+        # BOUTON : Séchoir à filament
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Turns the filament dryer/heater on or off.
-        #   This device removes moisture from 3D printer filament to improve
-        #   print quality (wet filament causes bubbles and weak prints).
+        # RÔLE :
+        #   Allume ou éteint le séchoir/chauffoir à filament.
+        #   Cet appareil retire l'humidité du filament d'imprimante 3D pour
+        #   améliorer la qualité d'impression (filament humide = bulles et fragilité).
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_filament_heater_893b
-        #   (The "893b" is a device identifier from the smart plug)
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_filament_heater_893b
+        #   ("893b" est l'identifiant de la prise connectée)
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_filament_heater_893b
-        #   When the switch is ON, this button appears "checked" (highlighted)
-        #   When the switch is OFF, this button appears unchecked (dimmed)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_filament_heater_893b
+        #   Quand la prise est ON, le bouton apparaît "coché" (mis en évidence)
+        #   Quand elle est OFF, le bouton apparaît décoché (atténué)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -361,13 +361,13 @@ lvgl:
             grid_cell_column_pos: 0
             grid_cell_row_pos: 2
             widgets:
-              # Icon (shown when OFF)
+              # Icône (affichée quand éteint)
               - label:
                   text_font: $icon_font
                   align: top_left
                   id: filament_heater_icon
                   text: $filament
-              # Humidity (shown when ON)
+              # Humidité (affichée quand allumé)
               - obj:
                   align: top_left
                   id: dryer_humidity_container
@@ -395,7 +395,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: filament_heater_label
-                  text: "Dryer"
+                  text: "Séchoir"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -403,18 +403,18 @@ lvgl:
                     entity_id: switch.office_filament_heater_893b
 
         # =========================================================================
-        # BUTTON: Air Conditioner
+        # BOUTON : Climatiseur
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Opens the air conditioner control page.
+        # RÔLE :
+        #   Ouvre la page de contrôle du climatiseur.
         #
-        # WHEN PRESSED:
-        #   Navigates to the aircon controls page.
+        # AU CLIC :
+        #   Navigue vers la page de contrôle de la clim.
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_air_conditioner
-        #   When the AC is running, this button appears "checked" (highlighted)
-        #   When the AC is off, this button appears unchecked (dimmed)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_air_conditioner
+        #   Quand la clim est en marche, le bouton apparaît "coché" (mis en évidence)
+        #   Quand elle est éteinte, le bouton apparaît décoché (atténué)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -431,7 +431,7 @@ lvgl:
                   text: $aircon
               - label:
                   align: bottom_left
-                  text: "Aircon"
+                  text: "Clim"
             on_click:
               - lvgl.page.show: aircon_page
               - lvgl.widget.update:
@@ -440,13 +440,13 @@ lvgl:
                     checked: !lambda return id(office_air_conditioner).state;
 
         # =========================================================================
-        # BUTTON: More
+        # BOUTON : Plus
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Opens the additional controls page.
+        # RÔLE :
+        #   Ouvre la page des contrôles supplémentaires.
         #
-        # WHEN PRESSED:
-        #   Navigates to the extras page.
+        # AU CLIC :
+        #   Navigue vers la page extras.
         # =========================================================================
         - button:
             height: $button_height_single
@@ -463,7 +463,7 @@ lvgl:
                   text: $chevron_left
               - label:
                   align: bottom_left
-                  text: "More"
+                  text: "Plus"
             on_click:
               - lvgl.page.show: extras_page
 
@@ -485,7 +485,7 @@ lvgl:
       widgets:
 
         # =========================================================================
-        # BUTTON: Back (Return to Main Page)
+        # BOUTON : Retour (retour à la page principale)
         # =========================================================================
         - button:
             height: $button_height_single
@@ -502,12 +502,12 @@ lvgl:
                   text: $chevron_left
               - label:
                   align: bottom_left
-                  text: "Back"
+                  text: "Retour"
             on_click:
               - lvgl.page.show: main_page
 
         # =========================================================================
-        # BUTTON: Heating Thermostat (Lab Layout)
+        # BOUTON : Thermostat chauffage (vue détaillée)
         # =========================================================================
         - button:
             height: $button_height_single
@@ -524,23 +524,23 @@ lvgl:
                   text: $aircon
               - label:
                   align: bottom_left
-                  text: "Heat"
+                  text: "Chauffage"
             on_click:
               - lvgl.page.show: heating_lab_page
 
         # =========================================================================
-        # BUTTON: Battery Charger
+        # BOUTON : Chargeur de batteries
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Toggles the battery charger's smart plug.
+        # RÔLE :
+        #   Bascule la prise connectée du chargeur de batteries.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.d4c5
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.d4c5
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.d4c5
-        #   When the switch is ON, this button appears "checked" (highlighted)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.d4c5
+        #   Quand la prise est ON, le bouton apparaît "coché" (mis en évidence)
         # =========================================================================
         - button:
             height: $button_height_single
@@ -559,7 +559,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: battery_charger_label
-                  text: "Charger"
+                  text: "Chargeur"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -567,18 +567,18 @@ lvgl:
                     entity_id: switch.d4c5
 
         # =========================================================================
-        # BUTTON: Storage Lights
+        # BOUTON : Lumières rangement
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Toggles the office storage area lights.
+        # RÔLE :
+        #   Bascule les lumières de la zone de rangement du bureau.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: light.toggle
-        #   Target: light.office_storage
+        # AU CLIC :
+        #   Appelle le service Home Assistant : light.toggle
+        #   Cible : light.office_storage
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: light.office_storage
-        #   When the light is ON, this button appears "checked" (highlighted)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : light.office_storage
+        #   Quand la lumière est ON, le bouton apparaît "coché" (mis en évidence)
         # =========================================================================
         - button:
             height: $button_height_single
@@ -597,7 +597,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: storage_lights_label
-                  text: "Storage"
+                  text: "Stockage"
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -605,18 +605,18 @@ lvgl:
                     entity_id: light.office_storage
 
         # =========================================================================
-        # BUTTON: Network Rack Lights
+        # BOUTON : Lumières rack réseau
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Toggles the network rack lights.
+        # RÔLE :
+        #   Bascule les lumières du rack réseau.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: light.toggle
-        #   Target: light.office_network_rack
+        # AU CLIC :
+        #   Appelle le service Home Assistant : light.toggle
+        #   Cible : light.office_network_rack
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: light.office_network_rack
-        #   When the light is ON, this button appears "checked" (highlighted)
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : light.office_network_rack
+        #   Quand la lumière est ON, le bouton apparaît "coché" (mis en évidence)
         # =========================================================================
         - button:
             height: $button_height_single
@@ -635,7 +635,7 @@ lvgl:
               - label:
                   align: bottom_left
                   id: network_rack_label
-                  text: "Network Rack"
+                  text: "Rack réseau"
             on_click:
               - homeassistant.service:
                   service: light.toggle
@@ -659,9 +659,9 @@ lvgl:
       widgets:
 
         # =========================================================================
-        # BUTTON: Back (Return to Main Page)
+        # BOUTON : Retour (retour à la page principale)
         # =========================================================================
-        - button: 
+        - button:
             height: $button_height_single
             width: $button_width
             checkable: false
@@ -674,27 +674,27 @@ lvgl:
                   text: $chevron_left
               - label:
                   align: bottom_left
-                  text: "Back"
+                  text: "Retour"
             on_click:
               - lvgl.page.show: main_page
 
         # =========================================================================
-        # BUTTON: Blind Open (100%)
+        # BOUTON : Volet ouvert (100%)
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Opens the office window blind completely (100% open position).
-        #   Maximum natural light enters the room.
+        # RÔLE :
+        #   Ouvre complètement le volet de la fenêtre du bureau (position 100% ouverte).
+        #   Lumière naturelle maximale dans la pièce.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: cover.set_cover_position
-        #   Target: cover.office_blind
-        #   Position: 100 (fully open)
+        # AU CLIC :
+        #   Appelle le service Home Assistant : cover.set_cover_position
+        #   Cible : cover.office_blind
+        #   Position : 100 (totalement ouvert)
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml reads the blind's current position from Home Assistant.
-        #   A template sensor (office_blind_100) checks if position is within
-        #   3% of 100%. If true, this button appears "checked" (highlighted).
-        #   The 3% tolerance accounts for minor motor positioning differences.
+        # ÉTAT VISUEL :
+        #   sensors.yaml lit la position actuelle du volet depuis Home Assistant.
+        #   Un capteur template (office_blind_100) vérifie si la position est
+        #   à moins de 3% de 100%. Si vrai, ce bouton apparaît "coché".
+        #   La tolérance de 3% tient compte des légères imprécisions du moteur.
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -709,7 +709,7 @@ lvgl:
                   text: $blinds_open
               - label:
                   align: bottom_left
-                  text: "Open"
+                  text: "Ouvert"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -718,21 +718,21 @@ lvgl:
                     position: "100"
 
         # =========================================================================
-        # BUTTON: Blind Semi Open (66%)
+        # BOUTON : Volet mi-ouvert (66%)
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Sets the office window blind to 66% open position.
-        #   Allows good natural light while providing some shade.
+        # RÔLE :
+        #   Positionne le volet à 66% d'ouverture.
+        #   Bonne lumière naturelle tout en procurant un peu d'ombre.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: cover.set_cover_position
-        #   Target: cover.office_blind
-        #   Position: 66 (two-thirds open)
+        # AU CLIC :
+        #   Appelle le service Home Assistant : cover.set_cover_position
+        #   Cible : cover.office_blind
+        #   Position : 66 (deux tiers ouvert)
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml reads the blind's current position from Home Assistant.
-        #   A template sensor (office_blind_66) checks if position is within
-        #   3% of 66%. If true, this button appears "checked" (highlighted).
+        # ÉTAT VISUEL :
+        #   sensors.yaml lit la position actuelle du volet depuis Home Assistant.
+        #   Un capteur template (office_blind_66) vérifie si la position est
+        #   à moins de 3% de 66%. Si vrai, ce bouton apparaît "coché".
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -747,7 +747,7 @@ lvgl:
                   text: $blinds_open
               - label:
                   align: bottom_left
-                  text: "Semi Open"
+                  text: "Mi-ouvert"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -756,21 +756,21 @@ lvgl:
                     position: "66"
 
         # =========================================================================
-        # BUTTON: Blind Semi Closed (33%)
+        # BOUTON : Volet mi-fermé (33%)
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Sets the office window blind to 33% open position.
-        #   Mostly closed but allows some light through.
+        # RÔLE :
+        #   Positionne le volet à 33% d'ouverture.
+        #   Principalement fermé mais laisse passer un peu de lumière.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: cover.set_cover_position
-        #   Target: cover.office_blind
-        #   Position: 33 (one-third open)
+        # AU CLIC :
+        #   Appelle le service Home Assistant : cover.set_cover_position
+        #   Cible : cover.office_blind
+        #   Position : 33 (un tiers ouvert)
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml reads the blind's current position from Home Assistant.
-        #   A template sensor (office_blind_33) checks if position is within
-        #   3% of 33%. If true, this button appears "checked" (highlighted).
+        # ÉTAT VISUEL :
+        #   sensors.yaml lit la position actuelle du volet depuis Home Assistant.
+        #   Un capteur template (office_blind_33) vérifie si la position est
+        #   à moins de 3% de 33%. Si vrai, ce bouton apparaît "coché".
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -785,7 +785,7 @@ lvgl:
                   text: $blinds_open
               - label:
                   align: bottom_left
-                  text: "Semi Closed"
+                  text: "Mi-fermé"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -794,21 +794,21 @@ lvgl:
                     position: "33"
 
         # =========================================================================
-        # BUTTON: Blind Close (0%)
+        # BOUTON : Volet fermé (0%)
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Closes the office window blind completely (0% open position).
-        #   Blocks all natural light and provides privacy.
+        # RÔLE :
+        #   Ferme complètement le volet de la fenêtre du bureau (position 0% ouverte).
+        #   Bloque toute lumière naturelle et assure l'intimité.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: cover.set_cover_position
-        #   Target: cover.office_blind
-        #   Position: 0 (fully closed)
+        # AU CLIC :
+        #   Appelle le service Home Assistant : cover.set_cover_position
+        #   Cible : cover.office_blind
+        #   Position : 0 (totalement fermé)
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml reads the blind's current position from Home Assistant.
-        #   A template sensor (office_blind_0) checks if position is within
-        #   3% of 0%. If true, this button appears "checked" (highlighted).
+        # ÉTAT VISUEL :
+        #   sensors.yaml lit la position actuelle du volet depuis Home Assistant.
+        #   Un capteur template (office_blind_0) vérifie si la position est
+        #   à moins de 3% de 0%. Si vrai, ce bouton apparaît "coché".
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -823,7 +823,7 @@ lvgl:
                   text: $blinds_closed
               - label:
                   align: bottom_left
-                  text: "Close"
+                  text: "Fermé"
             on_click:
               - homeassistant.service:
                   service: cover.set_cover_position
@@ -848,9 +848,9 @@ lvgl:
       widgets:
 
         # =========================================================================
-        # BUTTON: Back (Return to Main Page)
+        # BOUTON : Retour (retour à la page principale)
         # =========================================================================
-        - button: 
+        - button:
             height: $button_height_single
             width: $button_width
             checkable: false
@@ -863,20 +863,20 @@ lvgl:
                   text: $chevron_left
               - label:
                   align: bottom_left
-                  text: "Back"
+                  text: "Retour"
             on_click:
               - lvgl.page.show: main_page
 
         # =========================================================================
-        # BUTTON: Aircon Temperature
+        # BOUTON : Température climatiseur
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Displays the current aircon temperature reading.
+        # RÔLE :
+        #   Affiche la lecture de température actuelle du climatiseur.
         #
-        # DATA SOURCE:
-        #   climate.office_air_conditioner (attribute: current_temperature)
+        # SOURCE DE DONNÉES :
+        #   climate.office_air_conditioner (attribut : current_temperature)
         #
-        # RELATED UI ELEMENT:
+        # ÉLÉMENT UI ASSOCIÉ :
         #   sensors.yaml → aircon_temp_label
         # =========================================================================
         - button: 
@@ -894,20 +894,20 @@ lvgl:
                   text_color: 0xFFFFFF
               - label:
                   align: bottom_left
-                  text: "Current"
+                  text: "Actuelle"
 
         # =========================================================================
-        # BUTTON: Aircon Power
+        # BOUTON : Marche/Arrêt climatiseur
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Turns the air conditioner on/off.
+        # RÔLE :
+        #   Allume ou éteint le climatiseur.
         #
-        # WHEN PRESSED:
-        #   Calls Home Assistant service: switch.toggle
-        #   Target: switch.office_air_conditioner
+        # AU CLIC :
+        #   Appelle le service Home Assistant : switch.toggle
+        #   Cible : switch.office_air_conditioner
         #
-        # HOW THE BUTTON KNOWS IF IT'S ACTIVE:
-        #   sensors.yaml monitors: switch.office_air_conditioner
+        # ÉTAT VISUEL :
+        #   sensors.yaml surveille : switch.office_air_conditioner
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -922,7 +922,7 @@ lvgl:
                   text: $aircon
               - label:
                   align: bottom_left
-                  text: "Power"
+                  text: "Marche"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
@@ -930,14 +930,14 @@ lvgl:
                     entity_id: switch.office_air_conditioner
 
         # =========================================================================
-        # BUTTON: Aircon Temp Up
+        # BOUTON : Augmenter température clim
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Increases the target temperature by 1°C.
-        #   Only shown when aircon power is ON.
+        # RÔLE :
+        #   Augmente la température cible de 1°C.
+        #   Affiché uniquement quand la clim est allumée.
         #
-        # DATA SOURCE:
-        #   climate.office_air_conditioner (attribute: temperature)
+        # SOURCE DE DONNÉES :
+        #   climate.office_air_conditioner (attribut : temperature)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -953,7 +953,7 @@ lvgl:
                   text: "+1°"
               - label:
                   align: bottom_left
-                  text: "Up"
+                  text: "Monter"
             on_click:
               - homeassistant.service:
                   service: climate.set_temperature
@@ -966,14 +966,14 @@ lvgl:
                       return 0.0f;
 
         # =========================================================================
-        # BUTTON: Aircon Set Temperature
+        # BOUTON : Consigne température clim
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Displays the current target/set temperature.
-        #   Only shown when aircon power is ON.
+        # RÔLE :
+        #   Affiche la température cible/consigne actuelle.
+        #   Affiché uniquement quand la clim est allumée.
         #
-        # DATA SOURCE:
-        #   climate.office_air_conditioner (attribute: temperature)
+        # SOURCE DE DONNÉES :
+        #   climate.office_air_conditioner (attribut : temperature)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -991,17 +991,17 @@ lvgl:
                   text_color: 0xFFFFFF
               - label:
                   align: bottom_left
-                  text: "Target"
+                  text: "Consigne"
 
         # =========================================================================
-        # BUTTON: Aircon Temp Down
+        # BOUTON : Baisser température clim
         # =========================================================================
-        # WHAT THIS BUTTON DOES:
-        #   Decreases the target temperature by 1°C.
-        #   Only shown when aircon power is ON.
+        # RÔLE :
+        #   Diminue la température cible de 1°C.
+        #   Affiché uniquement quand la clim est allumée.
         #
-        # DATA SOURCE:
-        #   climate.office_air_conditioner (attribute: temperature)
+        # SOURCE DE DONNÉES :
+        #   climate.office_air_conditioner (attribut : temperature)
         # =========================================================================
         - button: 
             height: $button_height_single
@@ -1017,7 +1017,7 @@ lvgl:
                   text: "-1°"
               - label:
                   align: bottom_left
-                  text: "Down"
+                  text: "Baisser"
             on_click:
               - homeassistant.service:
                   service: climate.set_temperature
@@ -1048,7 +1048,7 @@ lvgl:
             border_width: 0
             pad_all: 0
             widgets:
-              # Back button
+              # Bouton retour
               - button:
                   id: aircon_lab_back_button
                   width: 60px
@@ -1064,7 +1064,7 @@ lvgl:
                   on_click:
                     - lvgl.page.show: aircon_page
 
-              # Power button
+              # Bouton marche/arrêt
               - button:
                   id: aircon_lab_power_button
                   width: 60px
@@ -1084,7 +1084,7 @@ lvgl:
                         data:
                           entity_id: switch.office_air_conditioner
 
-              # Arc control for target temperature
+              # Arc de contrôle pour la température cible
               - arc:
                   id: aircon_target_arc
                   x: 60
@@ -1113,7 +1113,7 @@ lvgl:
                           entity_id: climate.office_air_conditioner
                           temperature: !lambda return x;
 
-              # Arc indicator for current temperature (read-only)
+              # Arc indicateur de la température actuelle (lecture seule)
               - arc:
                   id: aircon_current_arc
                   x: 60
@@ -1135,7 +1135,7 @@ lvgl:
                     bg_color: 0x7A7A7A
                   clickable: false
 
-              # Target temperature label (below)
+              # Label température cible (en dessous)
               - label:
                   id: aircon_lab_target_label
                   text: "--°"
@@ -1144,7 +1144,7 @@ lvgl:
                   align: center
                   y: 60
 
-              # Down button
+              # Bouton baisser
               - button:
                   id: aircon_lab_down_button
                   width: 70px
@@ -1174,7 +1174,7 @@ lvgl:
                             }
                             return 0.0f;
 
-              # Up button
+              # Bouton augmenter
               - button:
                   id: aircon_lab_up_button
                   width: 70px
@@ -1223,7 +1223,7 @@ lvgl:
             border_width: 0
             pad_all: 0
             widgets:
-              # Back button
+              # Bouton retour
               - button:
                   id: heating_lab_back_button
                   width: 60px
@@ -1239,7 +1239,7 @@ lvgl:
                   on_click:
                     - lvgl.page.show: main_page
 
-              # Base track arc
+              # Arc de piste de base
               - arc:
                   id: heating_track_arc
                   x: 60
@@ -1262,7 +1262,7 @@ lvgl:
                   knob:
                     bg_color: 0x3A3A3A
 
-              # Delta arc between current and target temperatures
+              # Arc delta entre température actuelle et cible
               - arc:
                   id: heating_delta_arc
                   x: 60
@@ -1284,7 +1284,7 @@ lvgl:
                     bg_color: 0x000000
                   clickable: false
 
-              # Mask arc to hide the segment below the minimum (track color)
+              # Arc masque pour cacher le segment sous le minimum (couleur de piste)
               - arc:
                   id: heating_mask_arc
                   x: 60
@@ -1306,7 +1306,7 @@ lvgl:
                     bg_color: 0x000000
                   clickable: false
 
-              # Dot for current temperature
+              # Point pour la température actuelle
               - arc:
                   id: heating_current_arc
                   x: 60
@@ -1330,7 +1330,7 @@ lvgl:
                     border_color: 0xE06A2A
                   clickable: false
 
-              # Dot for target temperature
+              # Point pour la température cible
               - arc:
                   id: heating_target_dot_arc
                   x: 65
@@ -1365,16 +1365,16 @@ lvgl:
                           hvac_mode: heat
                           temperature: !lambda return (float)x / 2.0f;
 
-              # Mode label
+              # Label mode
               - label:
                   id: heating_lab_mode_label
-                  text: "Heating"
+                  text: "Chauffe"
                   text_font: roboto19_font
                   text_color: 0xE06A2A
                   align: center
                   y: -70
 
-              # Target temperature label (center)
+              # Label température cible (centre)
               - label:
                   id: heating_lab_target_label
                   text: "--.-°C"
@@ -1382,7 +1382,7 @@ lvgl:
                   text_color: 0xE6E6E6
                   align: center
 
-              # Current temperature label (below)
+              # Label température actuelle (en dessous)
               - obj:
                   id: heating_lab_current_row
                   width: SIZE_CONTENT
@@ -1412,7 +1412,7 @@ lvgl:
                         text_color: 0xE06A2A
                         align: center
 
-              # Down button (-0.5C)
+              # Bouton baisser (-0.5°C)
               - button:
                   id: heating_lab_down_button
                   width: 70px
@@ -1442,7 +1442,7 @@ lvgl:
                             }
                             return 0.0f;
 
-              # Up button (+0.5C)
+              # Bouton augmenter (+0.5°C)
               - button:
                   id: heating_lab_up_button
                   width: 70px
