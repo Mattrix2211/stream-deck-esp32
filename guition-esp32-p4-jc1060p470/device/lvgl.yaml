@@ -2,10 +2,13 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+  # ─────────────────────────────────────────────────────────────
+  # COUCHE SUPÉRIEURE — visible sur toutes les pages
+  # ─────────────────────────────────────────────────────────────
   top_layer:
     widgets:
 
-      # Temperature
+      # Température int/ext
       - label:
           text: "-° / -°"
           id: temperatures
@@ -15,7 +18,7 @@ lvgl:
           y: 8
           text_color: 0xFFFFFF
 
-      # Clock
+      # Horloge
       - label:
           text: "--:--"
           id: display_time
@@ -26,8 +29,52 @@ lvgl:
           text_align: center
           text_color: 0xFFFFFF
 
+      # Tab — Lumières (actif par défaut)
+      - button:
+          id: nav_lights_btn
+          align: top_right
+          x: -218
+          y: 4
+          height: 34
+          width: 104
+          checkable: true
+          styles: control
+          on_click:
+            - lvgl.page.show: lights_page
+          widgets:
+            - label:
+                text: "Lumières"
+                align: center
+                text_font: label_font
+                text_color: 0xFFFFFF
+
+      # Tab — Scènes
+      - button:
+          id: nav_scenes_btn
+          align: top_right
+          x: -108
+          y: 4
+          height: 34
+          width: 100
+          checkable: true
+          styles: control
+          on_click:
+            - lvgl.page.show: scenes_page
+          widgets:
+            - label:
+                text: "Scènes"
+                align: center
+                text_font: label_font
+                text_color: 0xFFFFFF
+
   pages:
-    - id: main_page
+
+    # ═════════════════════════════════════════════
+    # PAGE 1 — LUMIÈRES
+    # Grille de 12 boutons + panneau de contrôle
+    # Appui court : toggle | Appui long : sélection
+    # ═════════════════════════════════════════════
+    - id: lights_page
       layout:
         type: flex
         flex_flow: column_wrap
@@ -36,127 +83,144 @@ lvgl:
       width: 100%
       bg_color: Black
       bg_opa: cover
-      pad_top: 42
+      pad_top: 48
       pad_bottom: 5
       pad_left: 5
       pad_right: 5
+      on_load:
+        - lvgl.widget.update:
+            id: nav_lights_btn
+            state: { checked: true }
+        - lvgl.widget.update:
+            id: nav_scenes_btn
+            state: { checked: false }
 
       widgets:
 
-        # Bureau
+        # ── Bureau ──────────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_scene_features_button
+            id: bureau_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: scene_features_icon
                   text: $lightbulb
               - label:
                   align: bottom_left
-                  id: scene_features_label
                   text: "Bureau"
-            on_press:
+            on_click:
               - homeassistant.service:
                   service: light.toggle
                   data:
                     entity_id: light.ampoule_bureau
             on_long_press:
-              - lvgl.label.update:
-                  id: selected_light_title
-                  text: "Bureau"
-              - lvgl.label.update:
-                  id: selected_light_toggle_label
-                  text: "Allumer / Éteindre"
-              - lvgl.label.update:
-                  id: selected_light_brightness
-                  text: "Lum : --"
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.ampoule_bureau"
+                  display_name: "Bureau"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Fado bureau
+        # ── Fado bureau ─────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_scene_calls_button
+            id: fado_bureau_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: office_scene_calls_icon
-                  text: $lightbulb
+                  text: $nightlight
               - label:
                   align: bottom_left
-                  id: office_scene_calls_label
                   text: "Fado bureau"
-            on_press:
+            on_click:
               - homeassistant.service:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010dc8ba13
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010dc8ba13"
+                  display_name: "Fado bureau"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Chambre
+        # ── Chambre ─────────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_scene_evening_button
+            id: chambre_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: office_scene_evening_icon
-                  text: $lightbulb
+                  text: $bed
               - label:
                   align: bottom_left
-                  id: office_scene_evening_label
                   text: "Chambre"
-            on_press:
+            on_click:
               - homeassistant.service:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010c014263
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010c014263"
+                  display_name: "Chambre"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Led chambre
+        # ── Led chambre ─────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_scene_dimmed_button
+            id: led_chambre_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: office_scene_dimmed_icon
                   text: $ledstrip
               - label:
                   align: bottom_left
-                  id: office_scene_dimmed_label
                   text: "Led chambre"
-            on_press:
+            on_click:
               - homeassistant.service:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010c58b8f2
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010c58b8f2"
+                  display_name: "Led chambre"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Salon
+        # ── Salon ───────────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_blind_open_button
+            id: salon_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  text: $lightbulb
+                  text: $sofa
               - label:
                   align: bottom_left
                   text: "Salon"
@@ -165,19 +229,26 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.0x00178801062d1c11
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x00178801062d1c11"
+                  display_name: "Salon"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Salle à manger
+        # ── Salle à manger ──────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_blind_66_button
+            id: salle_manger_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  text: $lightbulb
+                  text: $fork_knife
               - label:
                   align: bottom_left
                   text: "Salle à manger"
@@ -186,13 +257,20 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010dc8c061
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010dc8c061"
+                  display_name: "Salle à manger"
+                  is_dimmable: true
+                  is_switch: false
 
-        # La boule
+        # ── La boule ────────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_blind_33_button
+            id: la_boule_light_btn
             styles: control
             widgets:
               - label:
@@ -207,13 +285,20 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.la_boule
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.la_boule"
+                  display_name: "La boule"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Salle de bain
+        # ── Salle de bain ───────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_blind_close_button
+            id: salle_bain_light_btn
             styles: control
             widgets:
               - label:
@@ -228,19 +313,25 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010c0adbc8
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010c0adbc8"
+                  display_name: "Salle de bain"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Cuisine
+        # ── Cuisine ─────────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: printer_power_button
+            id: cuisine_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: printer_power_icon
                   text: $lightbulb
               - label:
                   align: bottom_left
@@ -250,19 +341,25 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010c2dee03
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010c2dee03"
+                  display_name: "Cuisine"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Led cuisine
+        # ── Led cuisine ─────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: filament_heater_button
+            id: led_cuisine_light_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: filament_heater_icon
                   text: $ledstrip
               - label:
                   align: bottom_left
@@ -272,13 +369,20 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010d0b3aa9
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010d0b3aa9"
+                  display_name: "Led cuisine"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Couloir
+        # ── Couloir ─────────────────────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: office_aircon_button
+            id: couloir_light_btn
             styles: control
             widgets:
               - label:
@@ -293,32 +397,45 @@ lvgl:
                   service: light.toggle
                   data:
                     entity_id: light.0x001788010c2de07e
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "light.0x001788010c2de07e"
+                  display_name: "Couloir"
+                  is_dimmable: true
+                  is_switch: false
 
-        # Lampe couloir
+        # ── Lampe couloir (prise) ───────────────
         - button:
             height: $button_height
             width: $button_width
             checkable: true
-            id: battery_charger_button
+            id: lampe_couloir_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  id: battery_charger_icon
                   text: $lightbulb
               - label:
                   align: bottom_left
-                  id: battery_charger_label
                   text: "Lampe couloir"
             on_click:
               - homeassistant.service:
                   service: switch.toggle
                   data:
                     entity_id: switch.lampe_couloir
+            on_long_press:
+              - script.execute:
+                  id: select_light_context
+                  entity_id: "switch.lampe_couloir"
+                  display_name: "Lampe couloir"
+                  is_dimmable: false
+                  is_switch: true
 
-
-        # Panneau latéral
+        # ── Panneau de contrôle ─────────────────
+        # Toujours visible. Appui long sur une tuile
+        # pour la sélectionner et contrôler ici.
         - obj:
             id: side_panel
             width: 250
@@ -332,34 +449,39 @@ lvgl:
             layout:
               type: flex
               flex_flow: column
+              flex_align_main: start
               pad_row: 12
             widgets:
+
+              # Titre — nom de la lampe sélectionnée
               - label:
                   id: selected_light_title
-                  text: "Aucune sélection"
+                  text: "Sélectionner\nune lumière"
                   text_color: 0xFFFFFF
+                  long_mode: wrap
+                  width: 100%
 
+              # Bouton ON / OFF — utilise le script toggle_selected_light
               - button:
                   id: selected_light_toggle_button
                   height: 48
                   width: 100%
                   styles: control
-                  on_press:
-                    - homeassistant.service:
-                        service: light.toggle
-                        data:
-                          entity_id: light.ampoule_bureau
+                  on_click:
+                    - script.execute: toggle_selected_light
                   widgets:
                     - label:
                         id: selected_light_toggle_label
                         text: "ON / OFF"
                         align: center
 
+              # Affichage luminosité actuelle
               - label:
                   id: selected_light_brightness
                   text: "Lum : --"
-                  text_color: 0xCCCCCC
+                  text_color: 0xAAAAAA
 
+              # Presets luminosité — désactivés jusqu'à sélection d'une lampe dimmable
               - obj:
                   width: 100%
                   height: SIZE_CONTENT
@@ -369,19 +491,19 @@ lvgl:
                   layout:
                     type: flex
                     flex_flow: row
-                    pad_column: 8
+                    pad_column: 6
                   widgets:
                     - button:
                         id: quick_25_button
                         height: 44
-                        width: 70
+                        width: 64
                         styles: control
-                        on_press:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: light.ampoule_bureau
-                                brightness_pct: "25"
+                        state:
+                          disabled: true
+                        on_click:
+                          - script.execute:
+                              id: set_selected_light_brightness
+                              brightness_pct: 25
                         widgets:
                           - label:
                               text: "25%"
@@ -390,14 +512,14 @@ lvgl:
                     - button:
                         id: quick_50_button
                         height: 44
-                        width: 70
+                        width: 64
                         styles: control
-                        on_press:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: light.ampoule_bureau
-                                brightness_pct: "50"
+                        state:
+                          disabled: true
+                        on_click:
+                          - script.execute:
+                              id: set_selected_light_brightness
+                              brightness_pct: 50
                         widgets:
                           - label:
                               text: "50%"
@@ -406,15 +528,269 @@ lvgl:
                     - button:
                         id: quick_100_button
                         height: 44
-                        width: 70
+                        width: 64
                         styles: control
-                        on_press:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: light.ampoule_bureau
-                                brightness_pct: "100"
+                        state:
+                          disabled: true
+                        on_click:
+                          - script.execute:
+                              id: set_selected_light_brightness
+                              brightness_pct: 100
                         widgets:
                           - label:
                               text: "100%"
                               align: center
+
+              # Bouton réinitialiser la sélection
+              - button:
+                  height: 36
+                  width: 100%
+                  styles: control
+                  on_click:
+                    - script.execute: reset_light_context
+                  widgets:
+                    - label:
+                        text: "✕ Effacer"
+                        align: center
+                        text_color: 0x888888
+
+
+    # ═════════════════════════════════════════════
+    # PAGE 2 — SCÈNES
+    # Actions globales + activation de scènes HA
+    # ═════════════════════════════════════════════
+    - id: scenes_page
+      layout:
+        type: flex
+        flex_flow: row_wrap
+        pad_row: 10
+        pad_column: 10
+      width: 100%
+      bg_color: Black
+      bg_opa: cover
+      pad_top: 48
+      pad_bottom: 5
+      pad_left: 5
+      pad_right: 5
+      on_load:
+        - lvgl.widget.update:
+            id: nav_lights_btn
+            state: { checked: false }
+        - lvgl.widget.update:
+            id: nav_scenes_btn
+            state: { checked: true }
+        - script.execute: reset_light_context
+
+      widgets:
+
+        # ── Tout éteindre ───────────────────────
+        - button:
+            height: $button_height
+            width: $button_width
+            id: all_lights_off_btn
+            styles: control
+            widgets:
+              - label:
+                  text_font: $icon_font
+                  align: top_left
+                  text: $power
+              - label:
+                  align: bottom_left
+                  text: "Tout éteindre"
+            on_click:
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.ampoule_bureau
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010dc8ba13
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010c014263
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010c58b8f2
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x00178801062d1c11
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010dc8c061
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.la_boule
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010c0adbc8
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010c2dee03
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010d0b3aa9
+              - homeassistant.service:
+                  service: light.turn_off
+                  data:
+                    entity_id: light.0x001788010c2de07e
+              - homeassistant.service:
+                  service: switch.turn_off
+                  data:
+                    entity_id: switch.lampe_couloir
+
+        # ── Tout allumer ────────────────────────
+        - button:
+            height: $button_height
+            width: $button_width
+            id: all_lights_on_btn
+            styles: control
+            widgets:
+              - label:
+                  text_font: $icon_font
+                  align: top_left
+                  text: $lightbulb
+              - label:
+                  align: bottom_left
+                  text: "Tout allumer"
+            on_click:
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.ampoule_bureau
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010dc8ba13
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010c014263
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010c58b8f2
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x00178801062d1c11
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010dc8c061
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.la_boule
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010c0adbc8
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010c2dee03
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010d0b3aa9
+              - homeassistant.service:
+                  service: light.turn_on
+                  data:
+                    entity_id: light.0x001788010c2de07e
+              - homeassistant.service:
+                  service: switch.turn_on
+                  data:
+                    entity_id: switch.lampe_couloir
+
+        # ── Mode soirée ─────────────────────────
+        # Adapter entity_id à ta scène HA
+        - button:
+            height: $button_height
+            width: $button_width
+            id: scene_evening_btn
+            styles: control
+            widgets:
+              - label:
+                  text_font: $icon_font
+                  align: top_left
+                  text: $nightlight
+              - label:
+                  align: bottom_left
+                  text: "Mode soirée"
+            on_click:
+              - homeassistant.service:
+                  service: scene.turn_on
+                  data:
+                    entity_id: scene.soiree
+
+        # ── Mode nuit ───────────────────────────
+        # Adapter entity_id à ta scène HA
+        - button:
+            height: $button_height
+            width: $button_width
+            id: scene_night_btn
+            styles: control
+            widgets:
+              - label:
+                  text_font: $icon_font
+                  align: top_left
+                  text: $nightlight
+              - label:
+                  align: bottom_left
+                  text: "Mode nuit"
+            on_click:
+              - homeassistant.service:
+                  service: scene.turn_on
+                  data:
+                    entity_id: scene.nuit
+
+        # ── Mode réveil ─────────────────────────
+        # Adapter entity_id à ta scène HA
+        - button:
+            height: $button_height
+            width: $button_width
+            id: scene_morning_btn
+            styles: control
+            widgets:
+              - label:
+                  text_font: $icon_font
+                  align: top_left
+                  text: $lightbulb
+              - label:
+                  align: bottom_left
+                  text: "Mode réveil"
+            on_click:
+              - homeassistant.service:
+                  service: scene.turn_on
+                  data:
+                    entity_id: scene.reveil
+
+        # ── Appel vidéo ─────────────────────────
+        # Adapter entity_id à ta scène HA
+        - button:
+            height: $button_height
+            width: $button_width
+            id: scene_calls_btn
+            styles: control
+            widgets:
+              - label:
+                  text_font: $icon_font
+                  align: top_left
+                  text: $videocall
+              - label:
+                  align: bottom_left
+                  text: "Appel vidéo"
+            on_click:
+              - homeassistant.service:
+                  service: scene.turn_on
+                  data:
+                    entity_id: scene.appel_video
