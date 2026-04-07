@@ -22,6 +22,11 @@ font:
       "\U000F089E",  # mdi-battery
       "\U000F07DE",  # mdi-filament
       "\U000F0317",  # mdi-lan
+      "\U000F0425",  # mdi-power
+      "\U000F0493",  # mdi-sofa
+      "\U000F02CB",  # mdi-bed
+      "\U000F0E52",  # mdi-silverware-fork-knife
+      "\U000F0280",  # mdi-emoticon-happy-outline
       ]
 
 # Map icons to names
@@ -42,4 +47,8 @@ substitutions:
   battery:        "\U000F089E"
   filament:       "\U000F07DE"
   lan:            "\U000F0317"
-
+  power:          "\U000F0425"
+  sofa:           "\U000F0493"
+  bed:            "\U000F02CB"
+  fork_knife:     "\U000F0E52"
+  happy:          "\U000F0280"
