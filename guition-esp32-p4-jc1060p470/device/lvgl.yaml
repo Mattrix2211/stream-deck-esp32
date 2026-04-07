@@ -711,86 +711,90 @@ lvgl:
                   data:
                     entity_id: switch.lampe_couloir
 
-        # ── Mode soirée ─────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Allumer le PC ───────────────────────
+        # Wake-on-LAN : remplacer XX:XX:XX:XX:XX:XX par l'adresse MAC du PC
+        # Ou utiliser switch.turn_on si le PC est géré via une prise connectée
         - button:
             height: $button_height
             width: $button_width
-            id: scene_evening_btn
+            id: pc_wake_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  text: $nightlight
+                  text: $monitor
               - label:
                   align: bottom_left
-                  text: "Mode soirée"
+                  text: "Allumer PC"
             on_click:
               - homeassistant.service:
-                  service: scene.turn_on
+                  service: wake_on_lan.send_magic_packet
                   data:
-                    entity_id: scene.soiree
+                    mac: "XX:XX:XX:XX:XX:XX"
 
-        # ── Mode nuit ───────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Éteindre le PC ──────────────────────
+        # Adapter selon ton intégration HA :
+        # - button.press si companion app Windows (button.pc_shutdown)
+        # - switch.turn_off si prise connectée
+        # - script.turn_on si script HA custom
         - button:
             height: $button_height
             width: $button_width
-            id: scene_night_btn
+            id: pc_shutdown_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  text: $nightlight
+                  text: $power
               - label:
                   align: bottom_left
-                  text: "Mode nuit"
+                  text: "Éteindre PC"
             on_click:
               - homeassistant.service:
-                  service: scene.turn_on
+                  service: button.press
                   data:
-                    entity_id: scene.nuit
+                    entity_id: button.pc_shutdown
 
-        # ── Mode réveil ─────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Veille PC ───────────────────────────
+        # Adapter selon ton intégration HA
         - button:
             height: $button_height
             width: $button_width
-            id: scene_morning_btn
+            id: pc_sleep_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  text: $lightbulb
+                  text: $sleep
               - label:
                   align: bottom_left
-                  text: "Mode réveil"
+                  text: "Veille PC"
             on_click:
               - homeassistant.service:
-                  service: scene.turn_on
+                  service: button.press
                   data:
-                    entity_id: scene.reveil
+                    entity_id: button.pc_sleep
 
-        # ── Appel vidéo ─────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Redémarrer PC ───────────────────────
+        # Adapter selon ton intégration HA
         - button:
             height: $button_height
             width: $button_width
-            id: scene_calls_btn
+            id: pc_restart_btn
             styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_left
-                  text: $videocall
+                  text: $restart
               - label:
                   align: bottom_left
-                  text: "Appel vidéo"
+                  text: "Redémarrer PC"
             on_click:
               - homeassistant.service:
-                  service: scene.turn_on
+                  service: button.press
                   data:
-                    entity_id: scene.appel_video
+                    entity_id: button.pc_restart
