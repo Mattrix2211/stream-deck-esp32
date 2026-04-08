@@ -1,6 +1,5 @@
 # http://materialdesignicons.com/cdn/7.4.47/
 
-# Define icons used
 font:
   - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
     id: icon_font
@@ -22,9 +21,15 @@ font:
       "\U000F089E",  # mdi-battery
       "\U000F07DE",  # mdi-filament
       "\U000F0317",  # mdi-lan
+      "\U000F0425",  # mdi-power
+      "\U000F0493",  # mdi-sofa
+      "\U000F02CB",  # mdi-bed
+      "\U000F0E52",  # mdi-silverware-fork-knife
+      "\U000F03FC",  # mdi-monitor
+      "\U000F0453",  # mdi-restart
+      "\U000F044F",  # mdi-sleep
       ]
 
-# Map icons to names
 substitutions:
   lightbulb:      "\U000F0335"
   printer:        "\U000F042B"
@@ -42,4 +47,10 @@ substitutions:
   battery:        "\U000F089E"
   filament:       "\U000F07DE"
   lan:            "\U000F0317"
-
+  power:          "\U000F0425"
+  sofa:           "\U000F0493"
+  bed:            "\U000F02CB"
+  fork_knife:     "\U000F0E52"
+  monitor:        "\U000F03FC"
+  restart:        "\U000F0453"
+  sleep:          "\U000F044F"
