@@ -91,6 +91,17 @@ lvgl:
         - lvgl.widget.update:
             id: nav_scenes_btn
             state: { checked: false }
+        # Rendre le fond/indicateur du slider teinte transparents
+        # Le curseur seul reste visible sur le fond arc-en-ciel
+        - lambda: |-
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_border_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_shadow_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(id(hue_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_border_color(id(hue_slider), lv_color_black(), LV_PART_KNOB);
+            lv_obj_set_style_border_width(id(hue_slider), 2, LV_PART_KNOB);
+            lv_obj_set_style_pad_all(id(hue_slider), 7, LV_PART_KNOB);
 
       widgets:
 
@@ -558,48 +569,65 @@ lvgl:
                         text: "Teinte"
                         text_color: 0xAAAAAA
 
-                    # Slider teinte (0-360°)
-                    - slider:
-                        id: hue_slider
+                    # Arc-en-ciel : image de fond + slider transparent superposé
+                    - obj:
                         width: 100%
-                        height: 20
-                        min_value: 0
-                        max_value: 360
-                        value: 0
-                        on_value:
-                          - lambda: |-
-                              id(sel_hue) = lv_slider_get_value(id(hue_slider));
-                              int h = id(sel_hue), s = id(sel_sat);
-                              float hf = h / 60.0f;
-                              float sf = s / 100.0f;
-                              int hi = (int)hf % 6;
-                              float f = hf - (int)hf;
-                              float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
-                              float r, g, b;
-                              switch(hi) {
-                                case 0: r=1;g=t;b=p; break;
-                                case 1: r=q;g=1;b=p; break;
-                                case 2: r=p;g=1;b=t; break;
-                                case 3: r=p;g=q;b=1; break;
-                                case 4: r=t;g=p;b=1; break;
-                                default: r=1;g=p;b=q; break;
-                              }
-                              uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
-                              lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
-                        on_release:
-                          - if:
-                              condition:
-                                lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
-                              then:
-                                - homeassistant.service:
-                                    service: light.turn_on
-                                    data_template:
-                                      entity_id: "{{ entity }}"
-                                      hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
-                                    variables:
-                                      entity: !lambda 'return id(selected_light);'
-                                      hs_hue: !lambda 'return std::to_string(id(sel_hue));'
-                                      hs_sat: !lambda 'return std::to_string(id(sel_sat));'
+                        height: 30
+                        bg_opa: TRANSP
+                        border_width: 0
+                        pad_all: 0
+                        widgets:
+                          # Fond arc-en-ciel (360x30 px, affiché en natif)
+                          - image:
+                              src: hue_gradient_img
+                              align: left_mid
+                              x: 0
+                              y: 0
+                          # Slider transparent — seul le curseur est visible
+                          - slider:
+                              id: hue_slider
+                              align: center
+                              x: 0
+                              y: 0
+                              width: 100%
+                              height: 30
+                              min_value: 0
+                              max_value: 360
+                              value: 0
+                              on_value:
+                                - lambda: |-
+                                    id(sel_hue) = lv_slider_get_value(id(hue_slider));
+                                    int h = id(sel_hue), s = id(sel_sat);
+                                    float hf = h / 60.0f;
+                                    float sf = s / 100.0f;
+                                    int hi = (int)hf % 6;
+                                    float f = hf - (int)hf;
+                                    float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                                    float r, g, b;
+                                    switch(hi) {
+                                      case 0: r=1;g=t;b=p; break;
+                                      case 1: r=q;g=1;b=p; break;
+                                      case 2: r=p;g=1;b=t; break;
+                                      case 3: r=p;g=q;b=1; break;
+                                      case 4: r=t;g=p;b=1; break;
+                                      default: r=1;g=p;b=q; break;
+                                    }
+                                    uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                                    lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
+                              on_release:
+                                - if:
+                                    condition:
+                                      lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                                    then:
+                                      - homeassistant.service:
+                                          service: light.turn_on
+                                          data_template:
+                                            entity_id: "{{ entity }}"
+                                            hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                                          variables:
+                                            entity: !lambda 'return id(selected_light);'
+                                            hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                            hs_sat: !lambda 'return std::to_string(id(sel_sat));'
 
                     - label:
                         text: "Saturation"

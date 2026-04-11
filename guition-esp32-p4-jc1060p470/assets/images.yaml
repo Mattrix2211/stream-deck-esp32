@@ -1,0 +1,5 @@
+image:
+  - file: 'guition-esp32-p4-jc1060p470/assets/hue_gradient.png'
+    id: hue_gradient_img
+    type: RGB565
+    use_transparency: false
