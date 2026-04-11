@@ -35,6 +35,14 @@ globals:
     type: int
     restore_value: false
     initial_value: "100"
+  - id: selected_light_is_color_temp
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: sel_color_temp_kelvin
+    type: int
+    restore_value: false
+    initial_value: "4000"
 
 script:
   # Réinitialise le panneau — aucune lampe sélectionnée
@@ -48,6 +56,7 @@ script:
           id(selected_light_valid) = false;
           id(selected_light_is_on) = false;
           id(selected_light_is_rgb) = false;
+          id(selected_light_is_color_temp) = false;
       - lvgl.label.update:
           id: selected_light_title
           text: "Sélectionner\nune lumière"
@@ -63,6 +72,9 @@ script:
       - lvgl.widget.update:
           id: color_section
           hidden: true
+      - lvgl.widget.update:
+          id: color_temp_section
+          hidden: true
 
   # Sélectionne une lampe — appel depuis on_long_press
   - id: select_light_context
@@ -72,6 +84,7 @@ script:
       is_dimmable: bool
       is_switch: bool
       is_rgb: bool
+      is_color_temp: bool
     then:
       - lambda: |-
           id(selected_light) = entity_id;
@@ -80,6 +93,7 @@ script:
           id(selected_light_is_switch) = is_switch;
           id(selected_light_valid) = true;
           id(selected_light_is_rgb) = is_rgb;
+          id(selected_light_is_color_temp) = is_color_temp;
       - lvgl.label.update:
           id: selected_light_title
           text:
@@ -113,6 +127,17 @@ script:
           else:
             - lvgl.widget.update:
                 id: color_section
+                hidden: true
+      - if:
+          condition:
+            lambda: 'return is_color_temp;'
+          then:
+            - lvgl.widget.update:
+                id: color_temp_section
+                hidden: false
+          else:
+            - lvgl.widget.update:
+                id: color_temp_section
                 hidden: true
 
   # Applique un preset de luminosité sur la lampe sélectionnée (gardé pour compatibilité)
@@ -354,6 +379,12 @@ sensor:
     filters:
       - multiply: 0.3921568627
     on_value:
+      - lambda: |-
+          float pct = x / 100.0f;
+          uint8_t r = (uint8_t)(0xFF * (0.25f + 0.75f * pct));
+          uint8_t g = (uint8_t)(0x8C * (0.25f + 0.75f * pct));
+          uint32_t tc = ((uint32_t)r << 16) | ((uint32_t)g << 8);
+          lv_obj_set_style_bg_color(id(bureau_light_btn), lv_color_hex(tc), LV_PART_MAIN | LV_STATE_CHECKED);
       - if:
           condition:
             lambda: 'return id(selected_light_valid) && id(selected_light) == "light.ampoule_bureau";'
@@ -506,6 +537,12 @@ sensor:
     filters:
       - multiply: 0.3921568627
     on_value:
+      - lambda: |-
+          float pct = x / 100.0f;
+          uint8_t r = (uint8_t)(0xFF * (0.25f + 0.75f * pct));
+          uint8_t g = (uint8_t)(0x8C * (0.25f + 0.75f * pct));
+          uint32_t tc = ((uint32_t)r << 16) | ((uint32_t)g << 8);
+          lv_obj_set_style_bg_color(id(cuisine_light_btn), lv_color_hex(tc), LV_PART_MAIN | LV_STATE_CHECKED);
       - if:
           condition:
             lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2dee03";'
@@ -544,6 +581,12 @@ sensor:
     filters:
       - multiply: 0.3921568627
     on_value:
+      - lambda: |-
+          float pct = x / 100.0f;
+          uint8_t r = (uint8_t)(0xFF * (0.25f + 0.75f * pct));
+          uint8_t g = (uint8_t)(0x8C * (0.25f + 0.75f * pct));
+          uint32_t tc = ((uint32_t)r << 16) | ((uint32_t)g << 8);
+          lv_obj_set_style_bg_color(id(couloir_light_btn), lv_color_hex(tc), LV_PART_MAIN | LV_STATE_CHECKED);
       - if:
           condition:
             lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2de07e";'
@@ -578,6 +621,57 @@ sensor:
             args:
               - id(indoor_temperature).state
               - x
+
+# ─────────────────────────────────────────────────────────────
+# TEMPÉRATURE DE COULEUR → panneau (slider si sélectionné)
+# ─────────────────────────────────────────────────────────────
+  - platform: homeassistant
+    id: bureau_color_temp
+    entity_id: light.ampoule_bureau
+    attribute: color_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.ampoule_bureau";'
+          then:
+            - lambda: |-
+                int k = (x > 0) ? (int)(1000000.0f / x) : 4000;
+                k = std::max(2700, std::min(6500, k));
+                id(sel_color_temp_kelvin) = k;
+                lv_slider_set_value(id(color_temp_slider), k, LV_ANIM_OFF);
+
+  - platform: homeassistant
+    id: cuisine_color_temp
+    entity_id: light.0x001788010c2dee03
+    attribute: color_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2dee03";'
+          then:
+            - lambda: |-
+                int k = (x > 0) ? (int)(1000000.0f / x) : 4000;
+                k = std::max(2700, std::min(6500, k));
+                id(sel_color_temp_kelvin) = k;
+                lv_slider_set_value(id(color_temp_slider), k, LV_ANIM_OFF);
+
+  - platform: homeassistant
+    id: couloir_color_temp
+    entity_id: light.0x001788010c2de07e
+    attribute: color_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2de07e";'
+          then:
+            - lambda: |-
+                int k = (x > 0) ? (int)(1000000.0f / x) : 4000;
+                k = std::max(2700, std::min(6500, k));
+                id(sel_color_temp_kelvin) = k;
+                lv_slider_set_value(id(color_temp_slider), k, LV_ANIM_OFF);
 
 
 # ─────────────────────────────────────────────────────────────

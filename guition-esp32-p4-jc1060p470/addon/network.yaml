@@ -4,6 +4,14 @@ binary_sensor:
     name: "Online"
     id: ink_ha_connected
     icon: mdi:check-network
+    on_state:
+      - if:
+          condition:
+            lambda: 'return x;'
+          then:
+            - lambda: 'lv_obj_set_style_bg_color(id(conn_indicator), lv_color_hex(0x00BB44), LV_PART_MAIN);'
+          else:
+            - lambda: 'lv_obj_set_style_bg_color(id(conn_indicator), lv_color_hex(0xFF2200), LV_PART_MAIN);'
 
 
 sensor:

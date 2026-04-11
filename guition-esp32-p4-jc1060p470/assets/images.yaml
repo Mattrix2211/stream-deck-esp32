@@ -3,3 +3,8 @@ image:
     id: hue_gradient_img
     type: RGB565
     use_transparency: false
+
+  - file: 'guition-esp32-p4-jc1060p470/assets/color_temp_gradient.png'
+    id: color_temp_gradient_img
+    type: RGB565
+    use_transparency: false

@@ -17,6 +17,19 @@ lvgl:
           y: 8
           text_color: 0xFFFFFF
 
+      # Pastille connexion HA (verte = OK, rouge = déconnecté)
+      - obj:
+          id: conn_indicator
+          align: top_left
+          x: 8
+          y: 34
+          width: 10
+          height: 10
+          radius: 5
+          bg_color: 0x00BB44
+          bg_opa: COVER
+          border_width: 0
+
       - label:
           text: "--:--"
           id: display_time
@@ -94,6 +107,7 @@ lvgl:
         # Rendre le fond/indicateur du slider teinte transparents
         # Le curseur seul reste visible sur le fond arc-en-ciel
         - lambda: |-
+            // Hue slider — fond et indicateur transparents, curseur blanc
             lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
             lv_obj_set_style_border_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
             lv_obj_set_style_shadow_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
@@ -102,6 +116,15 @@ lvgl:
             lv_obj_set_style_border_color(id(hue_slider), lv_color_black(), LV_PART_KNOB);
             lv_obj_set_style_border_width(id(hue_slider), 2, LV_PART_KNOB);
             lv_obj_set_style_pad_all(id(hue_slider), 7, LV_PART_KNOB);
+            // Color temp slider — même traitement
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_border_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_shadow_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(id(color_temp_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_border_color(id(color_temp_slider), lv_color_black(), LV_PART_KNOB);
+            lv_obj_set_style_border_width(id(color_temp_slider), 2, LV_PART_KNOB);
+            lv_obj_set_style_pad_all(id(color_temp_slider), 7, LV_PART_KNOB);
 
       widgets:
 
@@ -134,6 +157,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: false
+                  is_color_temp: true
 
         # ── Fado bureau ─────────────────────────
         - button:
@@ -164,6 +188,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Chambre ─────────────────────────────
         - button:
@@ -194,6 +219,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Led chambre ─────────────────────────
         - button:
@@ -224,6 +250,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Salon ───────────────────────────────
         - button:
@@ -254,6 +281,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Salle à manger ──────────────────────
         - button:
@@ -284,6 +312,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── La boule ────────────────────────────
         - button:
@@ -314,6 +343,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Salle de bain ───────────────────────
         - button:
@@ -344,6 +374,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Cuisine ─────────────────────────────
         - button:
@@ -374,6 +405,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: false
+                  is_color_temp: true
 
         # ── Led cuisine ─────────────────────────
         - button:
@@ -404,6 +436,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: true
+                  is_color_temp: false
 
         # ── Couloir ─────────────────────────────
         - button:
@@ -434,6 +467,7 @@ lvgl:
                   is_dimmable: true
                   is_switch: false
                   is_rgb: false
+                  is_color_temp: true
 
         # ── Lampe couloir (prise) ───────────────
         - button:
@@ -464,6 +498,7 @@ lvgl:
                   is_dimmable: false
                   is_switch: true
                   is_rgb: false
+                  is_color_temp: false
 
         # ── Panneau de contrôle ─────────────────
         - obj:
@@ -539,6 +574,60 @@ lvgl:
                               data:
                                 entity_id: !lambda 'return id(selected_light);'
                                 brightness_pct: !lambda 'return lv_slider_get_value(id(brightness_slider));'
+
+              # Section température de couleur (visible pour lampes non-RGB avec color_temp)
+              - obj:
+                  id: color_temp_section
+                  width: 100%
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  hidden: true
+                  layout:
+                    type: flex
+                    flex_flow: column
+                    pad_row: 8
+                  widgets:
+
+                    - label:
+                        text: "Température"
+                        text_color: 0xAAAAAA
+
+                    # Gradient chaud→froid + slider transparent superposé
+                    - obj:
+                        width: 100%
+                        height: 30
+                        bg_opa: TRANSP
+                        border_width: 0
+                        pad_all: 0
+                        widgets:
+                          - image:
+                              src: color_temp_gradient_img
+                              align: left_mid
+                              x: 0
+                              y: 0
+                          - slider:
+                              id: color_temp_slider
+                              align: center
+                              x: 0
+                              y: 0
+                              width: 100%
+                              height: 30
+                              min_value: 2700
+                              max_value: 6500
+                              value: 4000
+                              on_release:
+                                - if:
+                                    condition:
+                                      lambda: 'return id(selected_light_valid) && id(selected_light_is_color_temp);'
+                                    then:
+                                      - lambda: 'id(sel_color_temp_kelvin) = lv_slider_get_value(id(color_temp_slider));'
+                                      - homeassistant.service:
+                                          service: light.turn_on
+                                          data:
+                                            entity_id: !lambda 'return id(selected_light);'
+                                            kelvin: !lambda 'return id(sel_color_temp_kelvin);'
 
               # Section couleur (visible uniquement pour les ampoules RGB)
               - obj:
