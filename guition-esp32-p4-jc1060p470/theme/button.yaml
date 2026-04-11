@@ -12,6 +12,9 @@ lvgl:
   style_definitions:
     - id: control
       bg_color: $button_control_color
+      border_width: 1
+      border_color: "0x484848"
+      border_opa: cover
 
   theme:
     button:
@@ -23,6 +26,8 @@ lvgl:
       pad_all: $padding
       shadow_width: 0
       text_color: $button_text_color
+      text_align: center
       checked:
         bg_color: $button_on_color
         text_color: $button_text_color
+        border_color: $button_on_color

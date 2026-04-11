@@ -138,10 +138,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $lightbulb
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Bureau"
             on_click:
               - homeassistant.service:
@@ -169,10 +170,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $nightlight
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Fado bureau"
             on_click:
               - homeassistant.service:
@@ -200,10 +202,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $bed
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Chambre"
             on_click:
               - homeassistant.service:
@@ -231,10 +234,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $ledstrip
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Led chambre"
             on_click:
               - homeassistant.service:
@@ -262,10 +266,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $sofa
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Salon"
             on_click:
               - homeassistant.service:
@@ -293,10 +298,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $fork_knife
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Salle à manger"
             on_click:
               - homeassistant.service:
@@ -324,10 +330,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $filament
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "La boule"
             on_click:
               - homeassistant.service:
@@ -355,10 +362,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $shower
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Salle de bain"
             on_click:
               - homeassistant.service:
@@ -386,10 +394,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $fork_knife
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Cuisine"
             on_click:
               - homeassistant.service:
@@ -417,10 +426,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $ledstrip
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Led cuisine"
             on_click:
               - homeassistant.service:
@@ -448,10 +458,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $door_closed
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Couloir"
             on_click:
               - homeassistant.service:
@@ -479,10 +490,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $floor_lamp
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Lampe couloir"
             on_click:
               - homeassistant.service:
@@ -815,10 +827,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $power
+                  align: top_mid
+                  text: $lightbulb_off
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Tout éteindre"
             on_click:
               - homeassistant.service:
@@ -879,10 +892,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $lightbulb_group
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Tout allumer"
             on_click:
               - homeassistant.service:
@@ -943,10 +957,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $monitor
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Allumer PC"
             on_click:
               - homeassistant.service:
@@ -963,10 +978,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $power
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Éteindre PC"
             on_click:
               - homeassistant.service:
@@ -983,10 +999,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $sleep
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Veille PC"
             on_click:
               - homeassistant.service:
@@ -1003,10 +1020,11 @@ lvgl:
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $restart
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Redémarrer PC"
             on_click:
               - homeassistant.service:
