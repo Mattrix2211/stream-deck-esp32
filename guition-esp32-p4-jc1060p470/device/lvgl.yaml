@@ -656,11 +656,64 @@ lvgl:
                         border_width: 0
                         pad_all: 0
                         widgets:
-                          - image:
-                              src: color_temp_gradient_img
+                          # Fond température : 6 segments du chaud (2700K) au froid (6500K)
+                          - obj:
                               align: left_mid
                               x: 0
                               y: 0
+                              width: 100%
+                              height: 30
+                              border_width: 0
+                              pad_all: 0
+                              radius: 4
+                              layout:
+                                type: flex
+                                flex_flow: row
+                                pad_row: 0
+                                pad_column: 0
+                              widgets:
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFF9D42
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFB870
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFCF9A
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFE8C8
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFF5E8
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFFEFA
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
                           - slider:
                               id: color_temp_slider
                               align: center
@@ -712,7 +765,7 @@ lvgl:
                         text: "Teinte"
                         text_color: 0x8892B0
 
-                    # Arc-en-ciel : image de fond + slider transparent superposé
+                    # Arc-en-ciel : 12 segments LVGL + slider transparent superposé
                     - obj:
                         width: 100%
                         height: 30
@@ -720,12 +773,34 @@ lvgl:
                         border_width: 0
                         pad_all: 0
                         widgets:
-                          # Fond arc-en-ciel (360x30 px, affiché en natif)
-                          - image:
-                              src: hue_gradient_img
+                          # Fond arc-en-ciel : 12 segments de 30° chacun
+                          - obj:
                               align: left_mid
                               x: 0
                               y: 0
+                              width: 100%
+                              height: 30
+                              border_width: 0
+                              pad_all: 0
+                              radius: 4
+                              layout:
+                                type: flex
+                                flex_flow: row
+                                pad_row: 0
+                                pad_column: 0
+                              widgets:
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0000, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF7F00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFFFF00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x80FF00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF80, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FFFF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x0080FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x0000FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x8000FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF00FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0080, border_width: 0, radius: 0, pad_all: 0 }
                           # Slider transparent — seul le curseur est visible
                           - slider:
                               id: hue_slider
