@@ -613,13 +613,13 @@ text_sensor:
           // RGB → HSV pour les sliders
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c58b8f2") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -642,13 +642,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(led_cuisine_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010d0b3aa9") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -671,13 +671,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(chambre_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c014263") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -700,13 +700,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(la_boule_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.la_boule") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -729,13 +729,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(fado_bureau_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8ba13") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -758,13 +758,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(salle_manger_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8c061") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -787,13 +787,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(salon_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x00178801062d1c11") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
@@ -816,13 +816,13 @@ text_sensor:
           lv_obj_set_style_bg_color(id(salle_bain_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
           float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
           float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
-          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
           if (diff>0.001f) {
             if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
             else if (cmax==gf) h=60*(bf-rf)/diff+120;
             else h=60*(rf-gf)/diff+240;
           }
-          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c0adbc8") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);

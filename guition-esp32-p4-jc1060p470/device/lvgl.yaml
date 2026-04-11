@@ -561,12 +561,16 @@ lvgl:
                               condition:
                                 lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
                               then:
+                                - lambda: 'id(sel_hue) = lv_slider_get_value(id(hue_slider));'
                                 - homeassistant.service:
                                     service: light.turn_on
-                                    data:
-                                      entity_id: !lambda 'return id(selected_light);'
-                                      hs_color: !lambda |-
-                                        return {(float)lv_slider_get_value(id(hue_slider)), (float)id(sel_sat)};
+                                    data_template:
+                                      entity_id: "{{ entity }}"
+                                      hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                                    variables:
+                                      entity: !lambda 'return id(selected_light);'
+                                      hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                      hs_sat: !lambda 'return std::to_string(id(sel_sat));'
 
                     - label:
                         text: "Saturation"
@@ -588,10 +592,13 @@ lvgl:
                                 - lambda: 'id(sel_sat) = lv_slider_get_value(id(sat_slider));'
                                 - homeassistant.service:
                                     service: light.turn_on
-                                    data:
-                                      entity_id: !lambda 'return id(selected_light);'
-                                      hs_color: !lambda |-
-                                        return {(float)id(sel_hue), (float)lv_slider_get_value(id(sat_slider))};
+                                    data_template:
+                                      entity_id: "{{ entity }}"
+                                      hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                                    variables:
+                                      entity: !lambda 'return id(selected_light);'
+                                      hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                      hs_sat: !lambda 'return std::to_string(id(sel_sat));'
 
               # Effacer la sélection
               - button:
