@@ -2,25 +2,13 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
-  # Couleurs d'ambiance par pièce (état éteint)
-  # L'état allumé vient du thème (glow orange) ou de la couleur réelle (RGB)
   style_definitions:
-    - id: room_office
-      bg_color: "0x0A1A2E"   # bleu travail — bureau
-    - id: room_bedroom
-      bg_color: "0x1A0A2E"   # violet sommeil — chambre
-    - id: room_living
-      bg_color: "0x261608"   # ambre chaud — salon / salle à manger
-    - id: room_utility
-      bg_color: "0x081E1A"   # sarcelle propre — cuisine / salle de bain
-    - id: room_hallway
-      bg_color: "0x10111E"   # bleu-gris neutre — couloir
     - id: scene_lights_off
-      bg_color: "0x280808"   # rouge sombre — tout éteindre
+      bg_color: "0x280808"
     - id: scene_lights_on
-      bg_color: "0x261808"   # ambre chaud — tout allumer
+      bg_color: "0x261808"
     - id: scene_pc
-      bg_color: "0x08101E"   # bleu tech — actions PC
+      bg_color: "0x08101E"
 
   # ─────────────────────────────────────────────────────────────
   # COUCHE SUPÉRIEURE — visible sur toutes les pages
@@ -28,7 +16,7 @@ lvgl:
   top_layer:
     widgets:
 
-      # Fond de la barre de navigation (dessiné en premier = derrière)
+      # Fond de la barre de navigation
       - obj:
           id: topbar_bg
           align: top_left
@@ -50,7 +38,7 @@ lvgl:
           y: 11
           text_color: 0xC8D0E0
 
-      # Pastille connexion HA (verte = OK, rouge = déconnecté)
+      # Pastille connexion HA
       - obj:
           id: conn_indicator
           align: top_left
@@ -115,12 +103,14 @@ lvgl:
 
     # ═════════════════════════════════════════════
     # PAGE 1 — LUMIÈRES
-    # Appui court : toggle | Appui long : sélection
+    # Appui court : toggle | Appui long : contrôle
+    # Glisser gauche → page Scènes
     # ═════════════════════════════════════════════
     - id: lights_page
+      scrollbar_mode: 'off'
       layout:
         type: flex
-        flex_flow: column_wrap
+        flex_flow: row_wrap
         pad_row: 10
         pad_column: 10
       width: 100%
@@ -137,27 +127,10 @@ lvgl:
         - lvgl.widget.update:
             id: nav_scenes_btn
             state: { checked: false }
-        # Rendre le fond/indicateur du slider teinte transparents
-        # Le curseur seul reste visible sur le fond arc-en-ciel
-        - lambda: |-
-            // Hue slider — fond et indicateur transparents, curseur blanc
-            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
-            lv_obj_set_style_border_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
-            lv_obj_set_style_shadow_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
-            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
-            lv_obj_set_style_bg_color(id(hue_slider), lv_color_white(), LV_PART_KNOB);
-            lv_obj_set_style_border_color(id(hue_slider), lv_color_black(), LV_PART_KNOB);
-            lv_obj_set_style_border_width(id(hue_slider), 2, LV_PART_KNOB);
-            lv_obj_set_style_pad_all(id(hue_slider), 7, LV_PART_KNOB);
-            // Color temp slider — même traitement
-            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
-            lv_obj_set_style_border_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
-            lv_obj_set_style_shadow_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
-            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
-            lv_obj_set_style_bg_color(id(color_temp_slider), lv_color_white(), LV_PART_KNOB);
-            lv_obj_set_style_border_color(id(color_temp_slider), lv_color_black(), LV_PART_KNOB);
-            lv_obj_set_style_border_width(id(color_temp_slider), 2, LV_PART_KNOB);
-            lv_obj_set_style_pad_all(id(color_temp_slider), 7, LV_PART_KNOB);
+      on_gesture:
+        direction: left
+        then:
+          - lvgl.page.show: scenes_page
 
       widgets:
 
@@ -167,7 +140,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: bureau_light_btn
-            styles: [control, room_office]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -199,7 +172,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: fado_bureau_light_btn
-            styles: [control, room_office]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -231,7 +204,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: chambre_light_btn
-            styles: [control, room_bedroom]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -263,7 +236,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: led_chambre_light_btn
-            styles: [control, room_bedroom]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -295,7 +268,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: salon_light_btn
-            styles: [control, room_living]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -327,7 +300,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: salle_manger_light_btn
-            styles: [control, room_living]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -359,12 +332,12 @@ lvgl:
             width: $button_width
             checkable: true
             id: la_boule_light_btn
-            styles: [control, room_living]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
                   align: top_mid
-                  text: $filament
+                  text: $lamp
               - label:
                   align: bottom_mid
                   text_align: center
@@ -391,7 +364,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: salle_bain_light_btn
-            styles: [control, room_utility]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -423,7 +396,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: cuisine_light_btn
-            styles: [control, room_utility]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -455,7 +428,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: led_cuisine_light_btn
-            styles: [control, room_utility]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -487,7 +460,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: couloir_light_btn
-            styles: [control, room_hallway]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -519,7 +492,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: lampe_couloir_btn
-            styles: [control, room_hallway]
+            styles: control
             widgets:
               - label:
                   text_font: $icon_font
@@ -545,373 +518,13 @@ lvgl:
                   is_rgb: false
                   is_color_temp: false
 
-        # ── Panneau de contrôle ─────────────────
-        - obj:
-            id: side_panel
-            width: 250
-            height: 100%
-            bg_color: 0x141726
-            bg_opa: COVER
-            radius: 14
-            pad_all: 14
-            border_width: 1
-            border_color: 0x262A3F
-            layout:
-              type: flex
-              flex_flow: column
-              flex_align_main: start
-              pad_row: 12
-            widgets:
-
-              # Nom de la lampe sélectionnée
-              - label:
-                  id: selected_light_title
-                  text: "Sélectionner\nune lumière"
-                  text_color: 0xFFFFFF
-                  long_mode: wrap
-                  width: 100%
-
-              # Séparateur horizontal
-              - obj:
-                  width: 100%
-                  height: 1
-                  bg_color: 0x262A3F
-                  bg_opa: COVER
-                  border_width: 0
-                  pad_all: 0
-
-              # Switch toggle — style interrupteur
-              # Désactivé tant qu'aucune lampe n'est sélectionnée
-              # on_value : turn_on/turn_off (idempotent, évite les conflits)
-              - switch:
-                  id: light_toggle_switch
-                  width: 80
-                  height: 40
-                  state:
-                    disabled: true
-                  on_value:
-                    - if:
-                        condition:
-                          lambda: 'return id(selected_light_valid);'
-                        then:
-                          - homeassistant.service:
-                              service: !lambda |-
-                                return id(selected_light_is_switch)
-                                  ? (x ? "switch.turn_on" : "switch.turn_off")
-                                  : (x ? "light.turn_on" : "light.turn_off");
-                              data:
-                                entity_id: !lambda 'return id(selected_light);'
-
-              # Luminosité actuelle
-              - label:
-                  id: selected_light_brightness
-                  text: "Lum : --"
-                  text_color: 0x8892B0
-
-              # Slider luminosité (0-100%)
-              - slider:
-                  id: brightness_slider
-                  width: 100%
-                  height: 20
-                  min_value: 0
-                  max_value: 100
-                  value: 0
-                  state:
-                    disabled: true
-                  on_release:
-                    - if:
-                        condition:
-                          lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
-                        then:
-                          - homeassistant.service:
-                              service: light.turn_on
-                              data:
-                                entity_id: !lambda 'return id(selected_light);'
-                                brightness_pct: !lambda 'return lv_slider_get_value(id(brightness_slider));'
-
-              # Section température de couleur (visible pour lampes non-RGB avec color_temp)
-              - obj:
-                  id: color_temp_section
-                  width: 100%
-                  height: SIZE_CONTENT
-                  bg_opa: TRANSP
-                  border_width: 0
-                  pad_all: 0
-                  hidden: true
-                  layout:
-                    type: flex
-                    flex_flow: column
-                    pad_row: 8
-                  widgets:
-
-                    - label:
-                        text: "Température"
-                        text_color: 0x8892B0
-
-                    # Gradient chaud→froid + slider transparent superposé
-                    - obj:
-                        width: 100%
-                        height: 30
-                        bg_opa: TRANSP
-                        border_width: 0
-                        pad_all: 0
-                        widgets:
-                          # Fond température : 6 segments du chaud (2700K) au froid (6500K)
-                          - obj:
-                              align: left_mid
-                              x: 0
-                              y: 0
-                              width: 100%
-                              height: 30
-                              border_width: 0
-                              pad_all: 0
-                              radius: 4
-                              layout:
-                                type: flex
-                                flex_flow: row
-                                pad_row: 0
-                                pad_column: 0
-                              widgets:
-                                - obj:
-                                    height: 30
-                                    flex_grow: 1
-                                    bg_color: 0xFF9D42
-                                    border_width: 0
-                                    radius: 0
-                                    pad_all: 0
-                                - obj:
-                                    height: 30
-                                    flex_grow: 1
-                                    bg_color: 0xFFB870
-                                    border_width: 0
-                                    radius: 0
-                                    pad_all: 0
-                                - obj:
-                                    height: 30
-                                    flex_grow: 1
-                                    bg_color: 0xFFCF9A
-                                    border_width: 0
-                                    radius: 0
-                                    pad_all: 0
-                                - obj:
-                                    height: 30
-                                    flex_grow: 1
-                                    bg_color: 0xFFE8C8
-                                    border_width: 0
-                                    radius: 0
-                                    pad_all: 0
-                                - obj:
-                                    height: 30
-                                    flex_grow: 1
-                                    bg_color: 0xFFF5E8
-                                    border_width: 0
-                                    radius: 0
-                                    pad_all: 0
-                                - obj:
-                                    height: 30
-                                    flex_grow: 1
-                                    bg_color: 0xFFFEFA
-                                    border_width: 0
-                                    radius: 0
-                                    pad_all: 0
-                          - slider:
-                              id: color_temp_slider
-                              align: center
-                              x: 0
-                              y: 0
-                              width: 100%
-                              height: 30
-                              min_value: 2700
-                              max_value: 6500
-                              value: 4000
-                              on_release:
-                                - if:
-                                    condition:
-                                      lambda: 'return id(selected_light_valid) && id(selected_light_is_color_temp);'
-                                    then:
-                                      - lambda: 'id(sel_color_temp_kelvin) = lv_slider_get_value(id(color_temp_slider));'
-                                      - homeassistant.service:
-                                          service: light.turn_on
-                                          data:
-                                            entity_id: !lambda 'return id(selected_light);'
-                                            kelvin: !lambda 'return id(sel_color_temp_kelvin);'
-
-              # Section couleur (visible uniquement pour les ampoules RGB)
-              - obj:
-                  id: color_section
-                  width: 100%
-                  height: SIZE_CONTENT
-                  bg_opa: TRANSP
-                  border_width: 0
-                  pad_all: 0
-                  hidden: true
-                  layout:
-                    type: flex
-                    flex_flow: column
-                    pad_row: 8
-                  widgets:
-
-                    # Aperçu couleur en temps réel
-                    - obj:
-                        id: color_preview
-                        width: 100%
-                        height: 32
-                        radius: 8
-                        border_width: 1
-                        border_color: 0x262A3F
-                        bg_color: 0xFFFFFF
-
-                    - label:
-                        text: "Teinte"
-                        text_color: 0x8892B0
-
-                    # Arc-en-ciel : 12 segments LVGL + slider transparent superposé
-                    - obj:
-                        width: 100%
-                        height: 30
-                        bg_opa: TRANSP
-                        border_width: 0
-                        pad_all: 0
-                        widgets:
-                          # Fond arc-en-ciel : 12 segments de 30° chacun
-                          - obj:
-                              align: left_mid
-                              x: 0
-                              y: 0
-                              width: 100%
-                              height: 30
-                              border_width: 0
-                              pad_all: 0
-                              radius: 4
-                              layout:
-                                type: flex
-                                flex_flow: row
-                                pad_row: 0
-                                pad_column: 0
-                              widgets:
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0000, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF7F00, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFFFF00, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x80FF00, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF00, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF80, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FFFF, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x0080FF, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x0000FF, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0x8000FF, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF00FF, border_width: 0, radius: 0, pad_all: 0 }
-                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0080, border_width: 0, radius: 0, pad_all: 0 }
-                          # Slider transparent — seul le curseur est visible
-                          - slider:
-                              id: hue_slider
-                              align: center
-                              x: 0
-                              y: 0
-                              width: 100%
-                              height: 30
-                              min_value: 0
-                              max_value: 360
-                              value: 0
-                              on_value:
-                                - lambda: |-
-                                    id(sel_hue) = lv_slider_get_value(id(hue_slider));
-                                    int h = id(sel_hue), s = id(sel_sat);
-                                    float hf = h / 60.0f;
-                                    float sf = s / 100.0f;
-                                    int hi = (int)hf % 6;
-                                    float f = hf - (int)hf;
-                                    float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
-                                    float r, g, b;
-                                    switch(hi) {
-                                      case 0: r=1;g=t;b=p; break;
-                                      case 1: r=q;g=1;b=p; break;
-                                      case 2: r=p;g=1;b=t; break;
-                                      case 3: r=p;g=q;b=1; break;
-                                      case 4: r=t;g=p;b=1; break;
-                                      default: r=1;g=p;b=q; break;
-                                    }
-                                    uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
-                                    lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
-                              on_release:
-                                - if:
-                                    condition:
-                                      lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
-                                    then:
-                                      - homeassistant.service:
-                                          service: light.turn_on
-                                          data_template:
-                                            entity_id: "{{ entity }}"
-                                            hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
-                                          variables:
-                                            entity: !lambda 'return id(selected_light);'
-                                            hs_hue: !lambda 'return std::to_string(id(sel_hue));'
-                                            hs_sat: !lambda 'return std::to_string(id(sel_sat));'
-
-                    - label:
-                        text: "Saturation"
-                        text_color: 0x8892B0
-
-                    # Slider saturation (0-100%)
-                    - slider:
-                        id: sat_slider
-                        width: 100%
-                        height: 20
-                        min_value: 0
-                        max_value: 100
-                        value: 100
-                        on_value:
-                          - lambda: |-
-                              id(sel_sat) = lv_slider_get_value(id(sat_slider));
-                              int h = id(sel_hue), s = id(sel_sat);
-                              float hf = h / 60.0f;
-                              float sf = s / 100.0f;
-                              int hi = (int)hf % 6;
-                              float f = hf - (int)hf;
-                              float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
-                              float r, g, b;
-                              switch(hi) {
-                                case 0: r=1;g=t;b=p; break;
-                                case 1: r=q;g=1;b=p; break;
-                                case 2: r=p;g=1;b=t; break;
-                                case 3: r=p;g=q;b=1; break;
-                                case 4: r=t;g=p;b=1; break;
-                                default: r=1;g=p;b=q; break;
-                              }
-                              uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
-                              lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
-                        on_release:
-                          - if:
-                              condition:
-                                lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
-                              then:
-                                - homeassistant.service:
-                                    service: light.turn_on
-                                    data_template:
-                                      entity_id: "{{ entity }}"
-                                      hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
-                                    variables:
-                                      entity: !lambda 'return id(selected_light);'
-                                      hs_hue: !lambda 'return std::to_string(id(sel_hue));'
-                                      hs_sat: !lambda 'return std::to_string(id(sel_sat));'
-
-              # Effacer la sélection
-              - button:
-                  height: 36
-                  width: 100%
-                  styles: control
-                  on_click:
-                    - script.execute: reset_light_context
-                  widgets:
-                    - label:
-                        text: "✕ Effacer"
-                        align: center
-                        text_color: 0x888888
-
 
     # ═════════════════════════════════════════════
     # PAGE 2 — PC & PLUS
+    # Glisser droite → page Lumières
     # ═════════════════════════════════════════════
     - id: scenes_page
+      scrollbar_mode: 'off'
       layout:
         type: flex
         flex_flow: row_wrap
@@ -932,6 +545,10 @@ lvgl:
             id: nav_scenes_btn
             state: { checked: true }
         - script.execute: reset_light_context
+      on_gesture:
+        direction: right
+        then:
+          - lvgl.page.show: lights_page
 
       widgets:
 
@@ -1148,3 +765,433 @@ lvgl:
                   service: button.press
                   data:
                     entity_id: button.pc_restart
+
+
+    # ═════════════════════════════════════════════
+    # PAGE 3 — CONTRÔLE LUMIÈRE (plein écran)
+    # Ouvert par appui long sur un bouton lumière
+    # Glisser droite → retour page Lumières
+    # ═════════════════════════════════════════════
+    - id: light_control_page
+      scrollbar_mode: 'off'
+      bg_color: 0x0D1117
+      bg_opa: cover
+      pad_top: 56
+      pad_left: 30
+      pad_right: 30
+      pad_bottom: 16
+      layout:
+        type: flex
+        flex_flow: column
+        flex_align_main: start
+        pad_row: 14
+      on_load:
+        - lvgl.widget.update:
+            id: nav_lights_btn
+            state: { checked: true }
+        - lvgl.widget.update:
+            id: nav_scenes_btn
+            state: { checked: false }
+        - lambda: |-
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_border_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_shadow_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(id(hue_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_border_color(id(hue_slider), lv_color_black(), LV_PART_KNOB);
+            lv_obj_set_style_border_width(id(hue_slider), 2, LV_PART_KNOB);
+            lv_obj_set_style_pad_all(id(hue_slider), 7, LV_PART_KNOB);
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_border_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_shadow_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(id(color_temp_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_border_color(id(color_temp_slider), lv_color_black(), LV_PART_KNOB);
+            lv_obj_set_style_border_width(id(color_temp_slider), 2, LV_PART_KNOB);
+            lv_obj_set_style_pad_all(id(color_temp_slider), 7, LV_PART_KNOB);
+      on_gesture:
+        direction: right
+        then:
+          - lvgl.page.show: lights_page
+
+      widgets:
+
+        # ── En-tête : nom de la lampe + interrupteur ──────────
+        - obj:
+            width: 100%
+            height: SIZE_CONTENT
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            layout:
+              type: flex
+              flex_flow: row
+              flex_align_cross: center
+              pad_column: 16
+            widgets:
+              - label:
+                  id: selected_light_title
+                  flex_grow: 1
+                  text: "─"
+                  text_color: 0xFFFFFF
+                  text_font: statistics_font
+                  text_align: center
+                  long_mode: dot
+              - switch:
+                  id: light_toggle_switch
+                  width: 80
+                  height: 44
+                  state:
+                    disabled: true
+                  on_value:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid);'
+                        then:
+                          - homeassistant.service:
+                              service: !lambda |-
+                                return id(selected_light_is_switch)
+                                  ? (x ? "switch.turn_on" : "switch.turn_off")
+                                  : (x ? "light.turn_on" : "light.turn_off");
+                              data:
+                                entity_id: !lambda 'return id(selected_light);'
+
+        # Séparateur
+        - obj:
+            width: 100%
+            height: 1
+            bg_color: 0x262A3F
+            bg_opa: COVER
+            border_width: 0
+            pad_all: 0
+
+        # ── Luminosité ────────────────────────────────────────
+        - obj:
+            width: 100%
+            height: SIZE_CONTENT
+            bg_color: 0x141726
+            radius: 12
+            border_width: 1
+            border_color: 0x262A3F
+            pad_all: 16
+            layout:
+              type: flex
+              flex_flow: column
+              pad_row: 10
+            widgets:
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  layout:
+                    type: flex
+                    flex_flow: row
+                    flex_align_cross: center
+                  widgets:
+                    - label:
+                        text: "Luminosité"
+                        text_color: 0x8892B0
+                        flex_grow: 1
+                    - label:
+                        id: selected_light_brightness
+                        text: "--"
+                        text_color: 0xFFFFFF
+              - slider:
+                  id: brightness_slider
+                  width: 100%
+                  height: 30
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  state:
+                    disabled: true
+                  on_release:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
+                        then:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: !lambda 'return id(selected_light);'
+                                brightness_pct: !lambda 'return lv_slider_get_value(id(brightness_slider));'
+
+        # ── Température de couleur (visible si is_color_temp) ─
+        - obj:
+            id: color_temp_section
+            width: 100%
+            height: SIZE_CONTENT
+            bg_color: 0x141726
+            radius: 12
+            border_width: 1
+            border_color: 0x262A3F
+            pad_all: 16
+            hidden: true
+            layout:
+              type: flex
+              flex_flow: column
+              pad_row: 10
+            widgets:
+              - label:
+                  text: "Température de couleur"
+                  text_color: 0x8892B0
+
+              # Gradient chaud→froid + slider transparent superposé
+              - obj:
+                  width: 100%
+                  height: 30
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  widgets:
+                    - obj:
+                        align: left_mid
+                        x: 0
+                        y: 0
+                        width: 100%
+                        height: 30
+                        border_width: 0
+                        pad_all: 0
+                        radius: 4
+                        layout:
+                          type: flex
+                          flex_flow: row
+                          pad_row: 0
+                          pad_column: 0
+                        widgets:
+                          - obj:
+                              height: 30
+                              flex_grow: 1
+                              bg_color: 0xFF9D42
+                              border_width: 0
+                              radius: 0
+                              pad_all: 0
+                          - obj:
+                              height: 30
+                              flex_grow: 1
+                              bg_color: 0xFFB870
+                              border_width: 0
+                              radius: 0
+                              pad_all: 0
+                          - obj:
+                              height: 30
+                              flex_grow: 1
+                              bg_color: 0xFFCF9A
+                              border_width: 0
+                              radius: 0
+                              pad_all: 0
+                          - obj:
+                              height: 30
+                              flex_grow: 1
+                              bg_color: 0xFFE8C8
+                              border_width: 0
+                              radius: 0
+                              pad_all: 0
+                          - obj:
+                              height: 30
+                              flex_grow: 1
+                              bg_color: 0xFFF5E8
+                              border_width: 0
+                              radius: 0
+                              pad_all: 0
+                          - obj:
+                              height: 30
+                              flex_grow: 1
+                              bg_color: 0xFFFEFA
+                              border_width: 0
+                              radius: 0
+                              pad_all: 0
+                    - slider:
+                        id: color_temp_slider
+                        align: center
+                        x: 0
+                        y: 0
+                        width: 100%
+                        height: 30
+                        min_value: 2700
+                        max_value: 6500
+                        value: 4000
+                        on_release:
+                          - if:
+                              condition:
+                                lambda: 'return id(selected_light_valid) && id(selected_light_is_color_temp);'
+                              then:
+                                - lambda: 'id(sel_color_temp_kelvin) = lv_slider_get_value(id(color_temp_slider));'
+                                - homeassistant.service:
+                                    service: light.turn_on
+                                    data:
+                                      entity_id: !lambda 'return id(selected_light);'
+                                      kelvin: !lambda 'return id(sel_color_temp_kelvin);'
+
+        # ── Couleur RGB (visible si is_rgb) ───────────────────
+        - obj:
+            id: color_section
+            width: 100%
+            height: SIZE_CONTENT
+            bg_color: 0x141726
+            radius: 12
+            border_width: 1
+            border_color: 0x262A3F
+            pad_all: 16
+            hidden: true
+            layout:
+              type: flex
+              flex_flow: column
+              pad_row: 10
+            widgets:
+
+              # Aperçu couleur en temps réel
+              - obj:
+                  id: color_preview
+                  width: 100%
+                  height: 32
+                  radius: 8
+                  border_width: 1
+                  border_color: 0x262A3F
+                  bg_color: 0xFFFFFF
+
+              - label:
+                  text: "Teinte"
+                  text_color: 0x8892B0
+
+              # Arc-en-ciel 12 segments + slider transparent
+              - obj:
+                  width: 100%
+                  height: 30
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  widgets:
+                    - obj:
+                        align: left_mid
+                        x: 0
+                        y: 0
+                        width: 100%
+                        height: 30
+                        border_width: 0
+                        pad_all: 0
+                        radius: 4
+                        layout:
+                          type: flex
+                          flex_flow: row
+                          pad_row: 0
+                          pad_column: 0
+                        widgets:
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0000, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0xFF7F00, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0xFFFF00, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x80FF00, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF00, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF80, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x00FFFF, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x0080FF, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x0000FF, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0x8000FF, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0xFF00FF, border_width: 0, radius: 0, pad_all: 0 }
+                          - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0080, border_width: 0, radius: 0, pad_all: 0 }
+                    - slider:
+                        id: hue_slider
+                        align: center
+                        x: 0
+                        y: 0
+                        width: 100%
+                        height: 30
+                        min_value: 0
+                        max_value: 360
+                        value: 0
+                        on_value:
+                          - lambda: |-
+                              id(sel_hue) = lv_slider_get_value(id(hue_slider));
+                              int h = id(sel_hue), s = id(sel_sat);
+                              float hf = h / 60.0f;
+                              float sf = s / 100.0f;
+                              int hi = (int)hf % 6;
+                              float f = hf - (int)hf;
+                              float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                              float r, g, b;
+                              switch(hi) {
+                                case 0: r=1;g=t;b=p; break;
+                                case 1: r=q;g=1;b=p; break;
+                                case 2: r=p;g=1;b=t; break;
+                                case 3: r=p;g=q;b=1; break;
+                                case 4: r=t;g=p;b=1; break;
+                                default: r=1;g=p;b=q; break;
+                              }
+                              uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                              lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
+                        on_release:
+                          - if:
+                              condition:
+                                lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                              then:
+                                - homeassistant.service:
+                                    service: light.turn_on
+                                    data_template:
+                                      entity_id: "{{ entity }}"
+                                      hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                                    variables:
+                                      entity: !lambda 'return id(selected_light);'
+                                      hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                      hs_sat: !lambda 'return std::to_string(id(sel_sat));'
+
+              - label:
+                  text: "Saturation"
+                  text_color: 0x8892B0
+
+              - slider:
+                  id: sat_slider
+                  width: 100%
+                  height: 20
+                  min_value: 0
+                  max_value: 100
+                  value: 100
+                  on_value:
+                    - lambda: |-
+                        id(sel_sat) = lv_slider_get_value(id(sat_slider));
+                        int h = id(sel_hue), s = id(sel_sat);
+                        float hf = h / 60.0f;
+                        float sf = s / 100.0f;
+                        int hi = (int)hf % 6;
+                        float f = hf - (int)hf;
+                        float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                        float r, g, b;
+                        switch(hi) {
+                          case 0: r=1;g=t;b=p; break;
+                          case 1: r=q;g=1;b=p; break;
+                          case 2: r=p;g=1;b=t; break;
+                          case 3: r=p;g=q;b=1; break;
+                          case 4: r=t;g=p;b=1; break;
+                          default: r=1;g=p;b=q; break;
+                        }
+                        uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                        lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
+                  on_release:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                        then:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data_template:
+                                entity_id: "{{ entity }}"
+                                hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                              variables:
+                                entity: !lambda 'return id(selected_light);'
+                                hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                hs_sat: !lambda 'return std::to_string(id(sel_sat));'
+
+        # ── Bouton retour ─────────────────────────────────────
+        - button:
+            height: 44
+            width: 100%
+            styles: control
+            on_click:
+              - script.execute: reset_light_context
+              - lvgl.page.show: lights_page
+            widgets:
+              - label:
+                  text: "Retour aux lumières"
+                  align: center
+                  text_color: 0x8892B0

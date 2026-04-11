@@ -139,6 +139,7 @@ script:
             - lvgl.widget.update:
                 id: color_temp_section
                 hidden: true
+      - lvgl.page.show: light_control_page
 
   # Applique un preset de luminosité sur la lampe sélectionnée (gardé pour compatibilité)
   - id: set_selected_light_brightness

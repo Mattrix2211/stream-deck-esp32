@@ -1,4 +1,5 @@
 # http://materialdesignicons.com/cdn/7.4.47/
+# Codepoints verified from MaterialDesign-Webfont v7.4.47 CSS
 
 font:
   - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
@@ -19,21 +20,21 @@ font:
       "\U000F036B",  # mdi-message-video
       "\U000F0614",  # mdi-application-outline
       "\U000F089E",  # mdi-battery
-      "\U000F07DE",  # mdi-filament
+      "\U000F06B5",  # mdi-lamp
       "\U000F0317",  # mdi-lan
       "\U000F0425",  # mdi-power
-      "\U000F0493",  # mdi-sofa
-      "\U000F02CB",  # mdi-bed
-      "\U000F0E52",  # mdi-silverware-fork-knife
-      "\U000F03FC",  # mdi-monitor
-      "\U000F0453",  # mdi-restart
-      "\U000F044F",  # mdi-sleep
-      "\U000F08D3",  # mdi-shower
-      "\U000F0B7B",  # mdi-door-closed
+      "\U000F04B9",  # mdi-sofa
+      "\U000F02E3",  # mdi-bed
+      "\U000F0A70",  # mdi-silverware-fork-knife
+      "\U000F0379",  # mdi-monitor
+      "\U000F0709",  # mdi-restart
+      "\U000F04B2",  # mdi-sleep
+      "\U000F09A0",  # mdi-shower
+      "\U000F081B",  # mdi-door-closed
       "\U000F08DD",  # mdi-floor-lamp
-      "\U000F0E14",  # mdi-lightbulb-off
+      "\U000F0E4F",  # mdi-lightbulb-off
       "\U000F1253",  # mdi-lightbulb-group
-      "\U000F06A8",  # mdi-walk (couloir)
+      "\U000F0583",  # mdi-walk
       ]
 
 substitutions:
@@ -51,18 +52,18 @@ substitutions:
   videocall:      "\U000F036B"
   application:    "\U000F0614"
   battery:        "\U000F089E"
-  filament:       "\U000F07DE"
+  lamp:           "\U000F06B5"
   lan:            "\U000F0317"
-  power:           "\U000F0425"
-  sofa:            "\U000F0493"
-  bed:             "\U000F02CB"
-  fork_knife:      "\U000F0E52"
-  monitor:         "\U000F03FC"
-  restart:         "\U000F0453"
-  sleep:           "\U000F044F"
-  shower:          "\U000F08D3"
-  door_closed:     "\U000F0B7B"
-  floor_lamp:      "\U000F08DD"
-  lightbulb_off:   "\U000F0E14"
+  power:          "\U000F0425"
+  sofa:           "\U000F04B9"
+  bed:            "\U000F02E3"
+  fork_knife:     "\U000F0A70"
+  monitor:        "\U000F0379"
+  restart:        "\U000F0709"
+  sleep:          "\U000F04B2"
+  shower:         "\U000F09A0"
+  door_closed:    "\U000F081B"
+  floor_lamp:     "\U000F08DD"
+  lightbulb_off:  "\U000F0E4F"
   lightbulb_group: "\U000F1253"
-  walk:            "\U000F06A8"
+  walk:           "\U000F0583"

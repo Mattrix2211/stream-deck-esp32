@@ -1,25 +1,20 @@
 # The styles below use these fonts, to change the font size, change the size here
+# glyphs: ASCII imprimable + caractères français
 font:
   - file: "gfonts://Roboto"
     id: statistics_font
     size: 48
     bpp: 4
-    extras:
-      - file: "gfonts://Roboto"
-        glyphs: "àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
+    glyphs: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
 
   - file: "gfonts://Roboto"
     id: label_font
     size: 22
     bpp: 4
-    extras:
-      - file: "gfonts://Roboto"
-        glyphs: "àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
+    glyphs: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
 
   - file: "gfonts://Roboto"
     id: clockbar_font
     size: 24
     bpp: 8
-    extras:
-      - file: "gfonts://Roboto"
-        glyphs: "àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
+    glyphs: " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
