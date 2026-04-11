@@ -4,13 +4,22 @@ font:
     id: statistics_font
     size: 48
     bpp: 4
+    extras:
+      - file: "gfonts://Roboto"
+        glyphs: "àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
 
   - file: "gfonts://Roboto"
     id: label_font
     size: 22
     bpp: 4
+    extras:
+      - file: "gfonts://Roboto"
+        glyphs: "àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"
 
   - file: "gfonts://Roboto"
     id: clockbar_font
-    size: 20
+    size: 24
     bpp: 8
+    extras:
+      - file: "gfonts://Roboto"
+        glyphs: "àâäçèéêëîïôùûüÿœæÀÂÄÇÈÉÊËÎÏÔÙÛÜŸŒÆ°"

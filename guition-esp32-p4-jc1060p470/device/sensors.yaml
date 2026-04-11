@@ -19,9 +19,33 @@ globals:
     type: bool
     restore_value: false
     initial_value: "false"
+  - id: selected_light_is_on
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: selected_light_is_rgb
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: sel_hue
+    type: int
+    restore_value: false
+    initial_value: "0"
+  - id: sel_sat
+    type: int
+    restore_value: false
+    initial_value: "100"
+  - id: selected_light_is_color_temp
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: sel_color_temp_kelvin
+    type: int
+    restore_value: false
+    initial_value: "4000"
 
 script:
-  # Réinitialise le panneau de contrôle (aucune lampe sélectionnée)
+  # Réinitialise le panneau — aucune lampe sélectionnée
   - id: reset_light_context
     then:
       - lambda: |-
@@ -30,6 +54,9 @@ script:
           id(selected_light_is_dimmable) = false;
           id(selected_light_is_switch) = false;
           id(selected_light_valid) = false;
+          id(selected_light_is_on) = false;
+          id(selected_light_is_rgb) = false;
+          id(selected_light_is_color_temp) = false;
       - lvgl.label.update:
           id: selected_light_title
           text: "Sélectionner\nune lumière"
@@ -37,22 +64,27 @@ script:
           id: selected_light_brightness
           text: "Lum : --"
       - lvgl.widget.update:
-          id: quick_25_button
+          id: light_toggle_switch
+          state: { checked: false, disabled: true }
+      - lvgl.widget.update:
+          id: brightness_slider
           state: { disabled: true }
       - lvgl.widget.update:
-          id: quick_50_button
-          state: { disabled: true }
+          id: color_section
+          hidden: true
       - lvgl.widget.update:
-          id: quick_100_button
-          state: { disabled: true }
+          id: color_temp_section
+          hidden: true
 
-  # Sélectionne une lampe dans le panneau de contrôle (appel depuis on_long_press)
+  # Sélectionne une lampe — appel depuis on_long_press
   - id: select_light_context
     parameters:
       entity_id: string
       display_name: string
       is_dimmable: bool
       is_switch: bool
+      is_rgb: bool
+      is_color_temp: bool
     then:
       - lambda: |-
           id(selected_light) = entity_id;
@@ -60,39 +92,55 @@ script:
           id(selected_light_is_dimmable) = is_dimmable;
           id(selected_light_is_switch) = is_switch;
           id(selected_light_valid) = true;
+          id(selected_light_is_rgb) = is_rgb;
+          id(selected_light_is_color_temp) = is_color_temp;
       - lvgl.label.update:
           id: selected_light_title
           text:
             format: "%s"
             args: [ display_name.c_str() ]
+      - lvgl.widget.update:
+          id: light_toggle_switch
+          state:
+            checked: !lambda 'return id(selected_light_is_on);'
+            disabled: false
       - if:
           condition:
             lambda: 'return is_dimmable;'
           then:
-            - lvgl.widget.update: { id: quick_25_button, state: { disabled: false } }
-            - lvgl.widget.update: { id: quick_50_button, state: { disabled: false } }
-            - lvgl.widget.update: { id: quick_100_button, state: { disabled: false } }
+            - lvgl.widget.update:
+                id: brightness_slider
+                state: { disabled: false }
             - lvgl.label.update: { id: selected_light_brightness, text: "Lum : --" }
           else:
-            - lvgl.widget.update: { id: quick_25_button, state: { disabled: true } }
-            - lvgl.widget.update: { id: quick_50_button, state: { disabled: true } }
-            - lvgl.widget.update: { id: quick_100_button, state: { disabled: true } }
+            - lvgl.widget.update:
+                id: brightness_slider
+                state: { disabled: true }
             - lvgl.label.update: { id: selected_light_brightness, text: "Lum : N/A" }
-
-  # Toggle la lampe actuellement sélectionnée
-  - id: toggle_selected_light
-    then:
       - if:
           condition:
-            lambda: 'return id(selected_light_valid);'
+            lambda: 'return is_rgb;'
           then:
-            - homeassistant.service:
-                service: !lambda |-
-                  return id(selected_light_is_switch) ? "switch.toggle" : "light.toggle";
-                data:
-                  entity_id: !lambda 'return id(selected_light);'
+            - lvgl.widget.update:
+                id: color_section
+                hidden: false
+          else:
+            - lvgl.widget.update:
+                id: color_section
+                hidden: true
+      - if:
+          condition:
+            lambda: 'return is_color_temp;'
+          then:
+            - lvgl.widget.update:
+                id: color_temp_section
+                hidden: false
+          else:
+            - lvgl.widget.update:
+                id: color_temp_section
+                hidden: true
 
-  # Applique un preset de luminosité sur la lampe sélectionnée
+  # Applique un preset de luminosité sur la lampe sélectionnée (gardé pour compatibilité)
   - id: set_selected_light_brightness
     parameters:
       brightness_pct: int
@@ -109,7 +157,7 @@ script:
 
 
 # ─────────────────────────────────────────────────────────────
-# ÉTATS ON/OFF DES LUMIÈRES → mise à jour des boutons LVGL
+# ÉTATS ON/OFF → boutons LVGL + mise à jour switch si sélectionné
 # ─────────────────────────────────────────────────────────────
 binary_sensor:
 
@@ -120,8 +168,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: bureau_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.ampoule_bureau";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: fado_bureau_light_state
@@ -130,8 +185,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: fado_bureau_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010dc8ba13";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: chambre_light_state
@@ -140,8 +202,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: chambre_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c014263";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: led_chambre_light_state
@@ -150,8 +219,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: led_chambre_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c58b8f2";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: salon_light_state
@@ -160,8 +236,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: salon_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x00178801062d1c11";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: salle_manger_light_state
@@ -170,8 +253,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: salle_manger_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010dc8c061";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: la_boule_light_state
@@ -180,8 +270,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: la_boule_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.la_boule";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: salle_bain_light_state
@@ -190,8 +287,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: salle_bain_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c0adbc8";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: cuisine_light_state
@@ -200,8 +304,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: cuisine_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2dee03";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: led_cuisine_light_state
@@ -210,8 +321,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: led_cuisine_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010d0b3aa9";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: couloir_light_state
@@ -220,8 +338,15 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: couloir_light_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2de07e";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
   - platform: homeassistant
     id: lampe_couloir_switch_state
@@ -230,14 +355,19 @@ binary_sensor:
     on_state:
       - lvgl.widget.update:
           id: lampe_couloir_btn
-          state:
-            checked: !lambda 'return x;'
+          state: { checked: !lambda 'return x;' }
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "switch.lampe_couloir";'
+          then:
+            - lambda: 'id(selected_light_is_on) = x;'
+            - lvgl.widget.update:
+                id: light_toggle_switch
+                state: { checked: !lambda 'return x;' }
 
 
 # ─────────────────────────────────────────────────────────────
-# LUMINOSITÉ DES LAMPES → panneau de contrôle (lampe sélectionnée)
-# Chaque capteur ne met à jour l'affichage que si c'est la lampe
-# actuellement sélectionnée dans le panneau latéral.
+# LUMINOSITÉ → panneau (label + slider si sélectionné)
 # ─────────────────────────────────────────────────────────────
 sensor:
 
@@ -247,8 +377,14 @@ sensor:
     attribute: brightness
     internal: true
     filters:
-      - multiply: 0.3921568627  # 100/255
+      - multiply: 0.3921568627
     on_value:
+      - lambda: |-
+          float pct = x / 100.0f;
+          uint8_t r = (uint8_t)(0xFF * (0.25f + 0.75f * pct));
+          uint8_t g = (uint8_t)(0x8C * (0.25f + 0.75f * pct));
+          uint32_t tc = ((uint32_t)r << 16) | ((uint32_t)g << 8);
+          lv_obj_set_style_bg_color(id(bureau_light_btn), lv_color_hex(tc), LV_PART_MAIN | LV_STATE_CHECKED);
       - if:
           condition:
             lambda: 'return id(selected_light_valid) && id(selected_light) == "light.ampoule_bureau";'
@@ -258,6 +394,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: fado_bureau_brightness
@@ -276,6 +413,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: chambre_brightness
@@ -294,6 +432,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: led_chambre_brightness
@@ -312,6 +451,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: salon_brightness
@@ -330,6 +470,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: salle_manger_brightness
@@ -348,6 +489,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: la_boule_brightness
@@ -366,6 +508,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: salle_bain_brightness
@@ -384,6 +527,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: cuisine_brightness
@@ -393,6 +537,12 @@ sensor:
     filters:
       - multiply: 0.3921568627
     on_value:
+      - lambda: |-
+          float pct = x / 100.0f;
+          uint8_t r = (uint8_t)(0xFF * (0.25f + 0.75f * pct));
+          uint8_t g = (uint8_t)(0x8C * (0.25f + 0.75f * pct));
+          uint32_t tc = ((uint32_t)r << 16) | ((uint32_t)g << 8);
+          lv_obj_set_style_bg_color(id(cuisine_light_btn), lv_color_hex(tc), LV_PART_MAIN | LV_STATE_CHECKED);
       - if:
           condition:
             lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2dee03";'
@@ -402,6 +552,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: led_cuisine_brightness
@@ -420,6 +571,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: couloir_brightness
@@ -429,6 +581,12 @@ sensor:
     filters:
       - multiply: 0.3921568627
     on_value:
+      - lambda: |-
+          float pct = x / 100.0f;
+          uint8_t r = (uint8_t)(0xFF * (0.25f + 0.75f * pct));
+          uint8_t g = (uint8_t)(0x8C * (0.25f + 0.75f * pct));
+          uint32_t tc = ((uint32_t)r << 16) | ((uint32_t)g << 8);
+          lv_obj_set_style_bg_color(id(couloir_light_btn), lv_color_hex(tc), LV_PART_MAIN | LV_STATE_CHECKED);
       - if:
           condition:
             lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2de07e";'
@@ -438,8 +596,8 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
-  # Température intérieure
   - platform: homeassistant
     id: indoor_temperature
     entity_id: sensor.office_temperature
@@ -451,7 +609,6 @@ sensor:
             format: "%.0f° / -°"
             args: [ x ]
 
-  # Température extérieure
   - platform: homeassistant
     id: outdoor_temperature
     entity_id: sensor.outdoor_temperature
@@ -465,9 +622,60 @@ sensor:
               - id(indoor_temperature).state
               - x
 
+# ─────────────────────────────────────────────────────────────
+# TEMPÉRATURE DE COULEUR → panneau (slider si sélectionné)
+# ─────────────────────────────────────────────────────────────
+  - platform: homeassistant
+    id: bureau_color_temp
+    entity_id: light.ampoule_bureau
+    attribute: color_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.ampoule_bureau";'
+          then:
+            - lambda: |-
+                int k = (x > 0) ? (int)(1000000.0f / x) : 4000;
+                k = std::max(2700, std::min(6500, k));
+                id(sel_color_temp_kelvin) = k;
+                lv_slider_set_value(id(color_temp_slider), k, LV_ANIM_OFF);
+
+  - platform: homeassistant
+    id: cuisine_color_temp
+    entity_id: light.0x001788010c2dee03
+    attribute: color_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2dee03";'
+          then:
+            - lambda: |-
+                int k = (x > 0) ? (int)(1000000.0f / x) : 4000;
+                k = std::max(2700, std::min(6500, k));
+                id(sel_color_temp_kelvin) = k;
+                lv_slider_set_value(id(color_temp_slider), k, LV_ANIM_OFF);
+
+  - platform: homeassistant
+    id: couloir_color_temp
+    entity_id: light.0x001788010c2de07e
+    attribute: color_temp
+    internal: true
+    on_value:
+      - if:
+          condition:
+            lambda: 'return id(selected_light_valid) && id(selected_light) == "light.0x001788010c2de07e";'
+          then:
+            - lambda: |-
+                int k = (x > 0) ? (int)(1000000.0f / x) : 4000;
+                k = std::max(2700, std::min(6500, k));
+                id(sel_color_temp_kelvin) = k;
+                lv_slider_set_value(id(color_temp_slider), k, LV_ANIM_OFF);
+
 
 # ─────────────────────────────────────────────────────────────
-# HORLOGE
+# HORLOGE + COULEURS RGB
 # ─────────────────────────────────────────────────────────────
 text_sensor:
   - platform: homeassistant
@@ -480,3 +688,244 @@ text_sensor:
           text:
             format: "%s"
             args: [ x.c_str() ]
+
+  # ── RGB : Led chambre ────────────────────────────────────
+  - platform: homeassistant
+    id: led_chambre_rgb
+    entity_id: light.0x001788010c58b8f2
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(led_chambre_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          // RGB → HSV pour les sliders
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c58b8f2") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : Led cuisine ────────────────────────────────────
+  - platform: homeassistant
+    id: led_cuisine_rgb
+    entity_id: light.0x001788010d0b3aa9
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(led_cuisine_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010d0b3aa9") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : Chambre ampoule ────────────────────────────────
+  - platform: homeassistant
+    id: chambre_rgb
+    entity_id: light.0x001788010c014263
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(chambre_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c014263") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : La boule ───────────────────────────────────────
+  - platform: homeassistant
+    id: la_boule_rgb
+    entity_id: light.la_boule
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(la_boule_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.la_boule") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : Fado bureau ────────────────────────────────────
+  - platform: homeassistant
+    id: fado_bureau_rgb
+    entity_id: light.0x001788010dc8ba13
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(fado_bureau_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8ba13") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : Salle à manger ─────────────────────────────────
+  - platform: homeassistant
+    id: salle_manger_rgb
+    entity_id: light.0x001788010dc8c061
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(salle_manger_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8c061") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : Salon ──────────────────────────────────────────
+  - platform: homeassistant
+    id: salon_rgb
+    entity_id: light.0x00178801062d1c11
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(salon_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x00178801062d1c11") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }
+
+  # ── RGB : Salle de bain ──────────────────────────────────
+  - platform: homeassistant
+    id: salle_bain_rgb
+    entity_id: light.0x001788010c0adbc8
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(salle_bain_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, sat=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(sat*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c0adbc8") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
+          }

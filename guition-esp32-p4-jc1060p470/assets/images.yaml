@@ -1,0 +1,8 @@
+image:
+  - file: 'hue_gradient.png'
+    id: hue_gradient_img
+    type: RGB565
+
+  - file: 'color_temp_gradient.png'
+    id: color_temp_gradient_img
+    type: RGB565

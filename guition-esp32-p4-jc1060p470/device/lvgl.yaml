@@ -2,34 +2,78 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+  # Couleurs d'ambiance par pièce (état éteint)
+  # L'état allumé vient du thème (glow orange) ou de la couleur réelle (RGB)
+  style_definitions:
+    - id: room_office
+      bg_color: "0x0A1A2E"   # bleu travail — bureau
+    - id: room_bedroom
+      bg_color: "0x1A0A2E"   # violet sommeil — chambre
+    - id: room_living
+      bg_color: "0x261608"   # ambre chaud — salon / salle à manger
+    - id: room_utility
+      bg_color: "0x081E1A"   # sarcelle propre — cuisine / salle de bain
+    - id: room_hallway
+      bg_color: "0x10111E"   # bleu-gris neutre — couloir
+    - id: scene_lights_off
+      bg_color: "0x280808"   # rouge sombre — tout éteindre
+    - id: scene_lights_on
+      bg_color: "0x261808"   # ambre chaud — tout allumer
+    - id: scene_pc
+      bg_color: "0x08101E"   # bleu tech — actions PC
+
   # ─────────────────────────────────────────────────────────────
   # COUCHE SUPÉRIEURE — visible sur toutes les pages
   # ─────────────────────────────────────────────────────────────
   top_layer:
     widgets:
 
-      # Température int/ext
+      # Fond de la barre de navigation (dessiné en premier = derrière)
+      - obj:
+          id: topbar_bg
+          align: top_left
+          x: 0
+          y: 0
+          width: 100%
+          height: 46
+          bg_color: 0x141726
+          bg_opa: cover
+          border_width: 0
+          radius: 0
+
       - label:
           text: "-° / -°"
           id: temperatures
           text_font: clockbar_font
           align: top_left
-          x: 8
-          y: 8
-          text_color: 0xFFFFFF
+          x: 26
+          y: 11
+          text_color: 0xC8D0E0
 
-      # Horloge
+      # Pastille connexion HA (verte = OK, rouge = déconnecté)
+      - obj:
+          id: conn_indicator
+          align: top_left
+          x: 10
+          y: 17
+          width: 12
+          height: 12
+          radius: 6
+          bg_color: 0x00BB44
+          bg_opa: COVER
+          border_width: 0
+
       - label:
           text: "--:--"
           id: display_time
           text_font: clockbar_font
           align: top_mid
           x: 0
-          y: 8
+          y: 11
           text_align: center
           text_color: 0xFFFFFF
 
-      # Tab — Lumières (actif par défaut)
+      # Tab — Lumières
       - button:
           id: nav_lights_btn
           align: top_right
@@ -48,7 +92,7 @@ lvgl:
                 text_font: label_font
                 text_color: 0xFFFFFF
 
-      # Tab — Scènes
+      # Tab — Scènes / PC
       - button:
           id: nav_scenes_btn
           align: top_right
@@ -62,7 +106,7 @@ lvgl:
             - lvgl.page.show: scenes_page
           widgets:
             - label:
-                text: "Scènes"
+                text: "PC & Plus"
                 align: center
                 text_font: label_font
                 text_color: 0xFFFFFF
@@ -71,7 +115,6 @@ lvgl:
 
     # ═════════════════════════════════════════════
     # PAGE 1 — LUMIÈRES
-    # Grille de 12 boutons + panneau de contrôle
     # Appui court : toggle | Appui long : sélection
     # ═════════════════════════════════════════════
     - id: lights_page
@@ -81,7 +124,7 @@ lvgl:
         pad_row: 10
         pad_column: 10
       width: 100%
-      bg_color: Black
+      bg_color: 0x0D1117
       bg_opa: cover
       pad_top: 48
       pad_bottom: 5
@@ -94,6 +137,27 @@ lvgl:
         - lvgl.widget.update:
             id: nav_scenes_btn
             state: { checked: false }
+        # Rendre le fond/indicateur du slider teinte transparents
+        # Le curseur seul reste visible sur le fond arc-en-ciel
+        - lambda: |-
+            // Hue slider — fond et indicateur transparents, curseur blanc
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_border_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_shadow_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(id(hue_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_border_color(id(hue_slider), lv_color_black(), LV_PART_KNOB);
+            lv_obj_set_style_border_width(id(hue_slider), 2, LV_PART_KNOB);
+            lv_obj_set_style_pad_all(id(hue_slider), 7, LV_PART_KNOB);
+            // Color temp slider — même traitement
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_border_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_shadow_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_INDICATOR);
+            lv_obj_set_style_bg_color(id(color_temp_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_border_color(id(color_temp_slider), lv_color_black(), LV_PART_KNOB);
+            lv_obj_set_style_border_width(id(color_temp_slider), 2, LV_PART_KNOB);
+            lv_obj_set_style_pad_all(id(color_temp_slider), 7, LV_PART_KNOB);
 
       widgets:
 
@@ -103,14 +167,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: bureau_light_btn
-            styles: control
+            styles: [control, room_office]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $lightbulb
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Bureau"
             on_click:
               - homeassistant.service:
@@ -118,12 +183,15 @@ lvgl:
                   data:
                     entity_id: light.ampoule_bureau
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(bureau_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.ampoule_bureau"
                   display_name: "Bureau"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: false
+                  is_color_temp: true
 
         # ── Fado bureau ─────────────────────────
         - button:
@@ -131,14 +199,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: fado_bureau_light_btn
-            styles: control
+            styles: [control, room_office]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $nightlight
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Fado bureau"
             on_click:
               - homeassistant.service:
@@ -146,12 +215,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010dc8ba13
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(fado_bureau_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010dc8ba13"
                   display_name: "Fado bureau"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Chambre ─────────────────────────────
         - button:
@@ -159,14 +231,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: chambre_light_btn
-            styles: control
+            styles: [control, room_bedroom]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $bed
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Chambre"
             on_click:
               - homeassistant.service:
@@ -174,12 +247,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010c014263
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(chambre_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010c014263"
                   display_name: "Chambre"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Led chambre ─────────────────────────
         - button:
@@ -187,14 +263,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: led_chambre_light_btn
-            styles: control
+            styles: [control, room_bedroom]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $ledstrip
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Led chambre"
             on_click:
               - homeassistant.service:
@@ -202,12 +279,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010c58b8f2
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(led_chambre_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010c58b8f2"
                   display_name: "Led chambre"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Salon ───────────────────────────────
         - button:
@@ -215,14 +295,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: salon_light_btn
-            styles: control
+            styles: [control, room_living]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $sofa
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Salon"
             on_click:
               - homeassistant.service:
@@ -230,12 +311,15 @@ lvgl:
                   data:
                     entity_id: light.0x00178801062d1c11
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(salon_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x00178801062d1c11"
                   display_name: "Salon"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Salle à manger ──────────────────────
         - button:
@@ -243,14 +327,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: salle_manger_light_btn
-            styles: control
+            styles: [control, room_living]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $fork_knife
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Salle à manger"
             on_click:
               - homeassistant.service:
@@ -258,12 +343,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010dc8c061
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(salle_manger_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010dc8c061"
                   display_name: "Salle à manger"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── La boule ────────────────────────────
         - button:
@@ -271,14 +359,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: la_boule_light_btn
-            styles: control
+            styles: [control, room_living]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $filament
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "La boule"
             on_click:
               - homeassistant.service:
@@ -286,12 +375,15 @@ lvgl:
                   data:
                     entity_id: light.la_boule
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(la_boule_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.la_boule"
                   display_name: "La boule"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Salle de bain ───────────────────────
         - button:
@@ -299,14 +391,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: salle_bain_light_btn
-            styles: control
+            styles: [control, room_utility]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $shower
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Salle de bain"
             on_click:
               - homeassistant.service:
@@ -314,12 +407,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010c0adbc8
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(salle_bain_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010c0adbc8"
                   display_name: "Salle de bain"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Cuisine ─────────────────────────────
         - button:
@@ -327,14 +423,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: cuisine_light_btn
-            styles: control
+            styles: [control, room_utility]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $fork_knife
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Cuisine"
             on_click:
               - homeassistant.service:
@@ -342,12 +439,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010c2dee03
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(cuisine_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010c2dee03"
                   display_name: "Cuisine"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: false
+                  is_color_temp: true
 
         # ── Led cuisine ─────────────────────────
         - button:
@@ -355,14 +455,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: led_cuisine_light_btn
-            styles: control
+            styles: [control, room_utility]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $ledstrip
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Led cuisine"
             on_click:
               - homeassistant.service:
@@ -370,12 +471,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010d0b3aa9
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(led_cuisine_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010d0b3aa9"
                   display_name: "Led cuisine"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
+                  is_color_temp: false
 
         # ── Couloir ─────────────────────────────
         - button:
@@ -383,14 +487,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: couloir_light_btn
-            styles: control
+            styles: [control, room_hallway]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $door_closed
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Couloir"
             on_click:
               - homeassistant.service:
@@ -398,12 +503,15 @@ lvgl:
                   data:
                     entity_id: light.0x001788010c2de07e
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(couloir_light_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "light.0x001788010c2de07e"
                   display_name: "Couloir"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: false
+                  is_color_temp: true
 
         # ── Lampe couloir (prise) ───────────────
         - button:
@@ -411,14 +519,15 @@ lvgl:
             width: $button_width
             checkable: true
             id: lampe_couloir_btn
-            styles: control
+            styles: [control, room_hallway]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $floor_lamp
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Lampe couloir"
             on_click:
               - homeassistant.service:
@@ -426,26 +535,27 @@ lvgl:
                   data:
                     entity_id: switch.lampe_couloir
             on_long_press:
+              - lambda: 'id(selected_light_is_on) = id(lampe_couloir_switch_state).state;'
               - script.execute:
                   id: select_light_context
                   entity_id: "switch.lampe_couloir"
                   display_name: "Lampe couloir"
                   is_dimmable: false
                   is_switch: true
+                  is_rgb: false
+                  is_color_temp: false
 
         # ── Panneau de contrôle ─────────────────
-        # Toujours visible. Appui long sur une tuile
-        # pour la sélectionner et contrôler ici.
         - obj:
             id: side_panel
             width: 250
             height: 100%
-            bg_color: 0x111111
+            bg_color: 0x141726
             bg_opa: COVER
-            radius: 12
+            radius: 14
             pad_all: 14
             border_width: 1
-            border_color: 0x2A2A2A
+            border_color: 0x262A3F
             layout:
               type: flex
               flex_flow: column
@@ -453,7 +563,7 @@ lvgl:
               pad_row: 12
             widgets:
 
-              # Titre — nom de la lampe sélectionnée
+              # Nom de la lampe sélectionnée
               - label:
                   id: selected_light_title
                   text: "Sélectionner\nune lumière"
@@ -461,87 +571,330 @@ lvgl:
                   long_mode: wrap
                   width: 100%
 
-              # Bouton ON / OFF — utilise le script toggle_selected_light
-              - button:
-                  id: selected_light_toggle_button
-                  height: 48
+              # Séparateur horizontal
+              - obj:
                   width: 100%
-                  styles: control
-                  on_click:
-                    - script.execute: toggle_selected_light
-                  widgets:
-                    - label:
-                        id: selected_light_toggle_label
-                        text: "ON / OFF"
-                        align: center
+                  height: 1
+                  bg_color: 0x262A3F
+                  bg_opa: COVER
+                  border_width: 0
+                  pad_all: 0
 
-              # Affichage luminosité actuelle
+              # Switch toggle — style interrupteur
+              # Désactivé tant qu'aucune lampe n'est sélectionnée
+              # on_value : turn_on/turn_off (idempotent, évite les conflits)
+              - switch:
+                  id: light_toggle_switch
+                  width: 80
+                  height: 40
+                  state:
+                    disabled: true
+                  on_value:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid);'
+                        then:
+                          - homeassistant.service:
+                              service: !lambda |-
+                                return id(selected_light_is_switch)
+                                  ? (x ? "switch.turn_on" : "switch.turn_off")
+                                  : (x ? "light.turn_on" : "light.turn_off");
+                              data:
+                                entity_id: !lambda 'return id(selected_light);'
+
+              # Luminosité actuelle
               - label:
                   id: selected_light_brightness
                   text: "Lum : --"
-                  text_color: 0xAAAAAA
+                  text_color: 0x8892B0
 
-              # Presets luminosité — désactivés jusqu'à sélection d'une lampe dimmable
+              # Slider luminosité (0-100%)
+              - slider:
+                  id: brightness_slider
+                  width: 100%
+                  height: 20
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  state:
+                    disabled: true
+                  on_release:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
+                        then:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: !lambda 'return id(selected_light);'
+                                brightness_pct: !lambda 'return lv_slider_get_value(id(brightness_slider));'
+
+              # Section température de couleur (visible pour lampes non-RGB avec color_temp)
               - obj:
+                  id: color_temp_section
                   width: 100%
                   height: SIZE_CONTENT
                   bg_opa: TRANSP
                   border_width: 0
                   pad_all: 0
+                  hidden: true
                   layout:
                     type: flex
-                    flex_flow: row
-                    pad_column: 6
+                    flex_flow: column
+                    pad_row: 8
                   widgets:
-                    - button:
-                        id: quick_25_button
-                        height: 44
-                        width: 64
-                        styles: control
-                        state:
-                          disabled: true
-                        on_click:
-                          - script.execute:
-                              id: set_selected_light_brightness
-                              brightness_pct: 25
-                        widgets:
-                          - label:
-                              text: "25%"
-                              align: center
 
-                    - button:
-                        id: quick_50_button
-                        height: 44
-                        width: 64
-                        styles: control
-                        state:
-                          disabled: true
-                        on_click:
-                          - script.execute:
-                              id: set_selected_light_brightness
-                              brightness_pct: 50
-                        widgets:
-                          - label:
-                              text: "50%"
-                              align: center
+                    - label:
+                        text: "Température"
+                        text_color: 0x8892B0
 
-                    - button:
-                        id: quick_100_button
-                        height: 44
-                        width: 64
-                        styles: control
-                        state:
-                          disabled: true
-                        on_click:
-                          - script.execute:
-                              id: set_selected_light_brightness
-                              brightness_pct: 100
+                    # Gradient chaud→froid + slider transparent superposé
+                    - obj:
+                        width: 100%
+                        height: 30
+                        bg_opa: TRANSP
+                        border_width: 0
+                        pad_all: 0
                         widgets:
-                          - label:
-                              text: "100%"
+                          # Fond température : 6 segments du chaud (2700K) au froid (6500K)
+                          - obj:
+                              align: left_mid
+                              x: 0
+                              y: 0
+                              width: 100%
+                              height: 30
+                              border_width: 0
+                              pad_all: 0
+                              radius: 4
+                              layout:
+                                type: flex
+                                flex_flow: row
+                                pad_row: 0
+                                pad_column: 0
+                              widgets:
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFF9D42
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFB870
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFCF9A
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFE8C8
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFF5E8
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                                - obj:
+                                    height: 30
+                                    flex_grow: 1
+                                    bg_color: 0xFFFEFA
+                                    border_width: 0
+                                    radius: 0
+                                    pad_all: 0
+                          - slider:
+                              id: color_temp_slider
                               align: center
+                              x: 0
+                              y: 0
+                              width: 100%
+                              height: 30
+                              min_value: 2700
+                              max_value: 6500
+                              value: 4000
+                              on_release:
+                                - if:
+                                    condition:
+                                      lambda: 'return id(selected_light_valid) && id(selected_light_is_color_temp);'
+                                    then:
+                                      - lambda: 'id(sel_color_temp_kelvin) = lv_slider_get_value(id(color_temp_slider));'
+                                      - homeassistant.service:
+                                          service: light.turn_on
+                                          data:
+                                            entity_id: !lambda 'return id(selected_light);'
+                                            kelvin: !lambda 'return id(sel_color_temp_kelvin);'
 
-              # Bouton réinitialiser la sélection
+              # Section couleur (visible uniquement pour les ampoules RGB)
+              - obj:
+                  id: color_section
+                  width: 100%
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  hidden: true
+                  layout:
+                    type: flex
+                    flex_flow: column
+                    pad_row: 8
+                  widgets:
+
+                    # Aperçu couleur en temps réel
+                    - obj:
+                        id: color_preview
+                        width: 100%
+                        height: 32
+                        radius: 8
+                        border_width: 1
+                        border_color: 0x262A3F
+                        bg_color: 0xFFFFFF
+
+                    - label:
+                        text: "Teinte"
+                        text_color: 0x8892B0
+
+                    # Arc-en-ciel : 12 segments LVGL + slider transparent superposé
+                    - obj:
+                        width: 100%
+                        height: 30
+                        bg_opa: TRANSP
+                        border_width: 0
+                        pad_all: 0
+                        widgets:
+                          # Fond arc-en-ciel : 12 segments de 30° chacun
+                          - obj:
+                              align: left_mid
+                              x: 0
+                              y: 0
+                              width: 100%
+                              height: 30
+                              border_width: 0
+                              pad_all: 0
+                              radius: 4
+                              layout:
+                                type: flex
+                                flex_flow: row
+                                pad_row: 0
+                                pad_column: 0
+                              widgets:
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0000, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF7F00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFFFF00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x80FF00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF00, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FF80, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x00FFFF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x0080FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x0000FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0x8000FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF00FF, border_width: 0, radius: 0, pad_all: 0 }
+                                - obj: { height: 30, flex_grow: 1, bg_color: 0xFF0080, border_width: 0, radius: 0, pad_all: 0 }
+                          # Slider transparent — seul le curseur est visible
+                          - slider:
+                              id: hue_slider
+                              align: center
+                              x: 0
+                              y: 0
+                              width: 100%
+                              height: 30
+                              min_value: 0
+                              max_value: 360
+                              value: 0
+                              on_value:
+                                - lambda: |-
+                                    id(sel_hue) = lv_slider_get_value(id(hue_slider));
+                                    int h = id(sel_hue), s = id(sel_sat);
+                                    float hf = h / 60.0f;
+                                    float sf = s / 100.0f;
+                                    int hi = (int)hf % 6;
+                                    float f = hf - (int)hf;
+                                    float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                                    float r, g, b;
+                                    switch(hi) {
+                                      case 0: r=1;g=t;b=p; break;
+                                      case 1: r=q;g=1;b=p; break;
+                                      case 2: r=p;g=1;b=t; break;
+                                      case 3: r=p;g=q;b=1; break;
+                                      case 4: r=t;g=p;b=1; break;
+                                      default: r=1;g=p;b=q; break;
+                                    }
+                                    uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                                    lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
+                              on_release:
+                                - if:
+                                    condition:
+                                      lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                                    then:
+                                      - homeassistant.service:
+                                          service: light.turn_on
+                                          data_template:
+                                            entity_id: "{{ entity }}"
+                                            hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                                          variables:
+                                            entity: !lambda 'return id(selected_light);'
+                                            hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                            hs_sat: !lambda 'return std::to_string(id(sel_sat));'
+
+                    - label:
+                        text: "Saturation"
+                        text_color: 0x8892B0
+
+                    # Slider saturation (0-100%)
+                    - slider:
+                        id: sat_slider
+                        width: 100%
+                        height: 20
+                        min_value: 0
+                        max_value: 100
+                        value: 100
+                        on_value:
+                          - lambda: |-
+                              id(sel_sat) = lv_slider_get_value(id(sat_slider));
+                              int h = id(sel_hue), s = id(sel_sat);
+                              float hf = h / 60.0f;
+                              float sf = s / 100.0f;
+                              int hi = (int)hf % 6;
+                              float f = hf - (int)hf;
+                              float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                              float r, g, b;
+                              switch(hi) {
+                                case 0: r=1;g=t;b=p; break;
+                                case 1: r=q;g=1;b=p; break;
+                                case 2: r=p;g=1;b=t; break;
+                                case 3: r=p;g=q;b=1; break;
+                                case 4: r=t;g=p;b=1; break;
+                                default: r=1;g=p;b=q; break;
+                              }
+                              uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                              lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
+                        on_release:
+                          - if:
+                              condition:
+                                lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                              then:
+                                - homeassistant.service:
+                                    service: light.turn_on
+                                    data_template:
+                                      entity_id: "{{ entity }}"
+                                      hs_color: "{{ [hs_hue|float, hs_sat|float] }}"
+                                    variables:
+                                      entity: !lambda 'return id(selected_light);'
+                                      hs_hue: !lambda 'return std::to_string(id(sel_hue));'
+                                      hs_sat: !lambda 'return std::to_string(id(sel_sat));'
+
+              # Effacer la sélection
               - button:
                   height: 36
                   width: 100%
@@ -556,8 +909,7 @@ lvgl:
 
 
     # ═════════════════════════════════════════════
-    # PAGE 2 — SCÈNES
-    # Actions globales + activation de scènes HA
+    # PAGE 2 — PC & PLUS
     # ═════════════════════════════════════════════
     - id: scenes_page
       layout:
@@ -566,7 +918,7 @@ lvgl:
         pad_row: 10
         pad_column: 10
       width: 100%
-      bg_color: Black
+      bg_color: 0x0D1117
       bg_opa: cover
       pad_top: 48
       pad_bottom: 5
@@ -585,17 +937,18 @@ lvgl:
 
         # ── Tout éteindre ───────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: all_lights_off_btn
-            styles: control
+            styles: [control, scene_lights_off]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $power
+                  align: top_mid
+                  text: $lightbulb_off
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Tout éteindre"
             on_click:
               - homeassistant.service:
@@ -649,17 +1002,18 @@ lvgl:
 
         # ── Tout allumer ────────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: all_lights_on_btn
-            styles: control
+            styles: [control, scene_lights_on]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
+                  align: top_mid
+                  text: $lightbulb_group
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Tout allumer"
             on_click:
               - homeassistant.service:
@@ -712,20 +1066,19 @@ lvgl:
                     entity_id: switch.lampe_couloir
 
         # ── Allumer le PC ───────────────────────
-        # Wake-on-LAN : remplacer XX:XX:XX:XX:XX:XX par l'adresse MAC du PC
-        # Ou utiliser switch.turn_on si le PC est géré via une prise connectée
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_wake_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $monitor
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Allumer PC"
             on_click:
               - homeassistant.service:
@@ -734,22 +1087,19 @@ lvgl:
                     mac: "XX:XX:XX:XX:XX:XX"
 
         # ── Éteindre le PC ──────────────────────
-        # Adapter selon ton intégration HA :
-        # - button.press si companion app Windows (button.pc_shutdown)
-        # - switch.turn_off si prise connectée
-        # - script.turn_on si script HA custom
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_shutdown_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $power
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Éteindre PC"
             on_click:
               - homeassistant.service:
@@ -758,19 +1108,19 @@ lvgl:
                     entity_id: button.pc_shutdown
 
         # ── Veille PC ───────────────────────────
-        # Adapter selon ton intégration HA
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_sleep_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $sleep
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Veille PC"
             on_click:
               - homeassistant.service:
@@ -779,19 +1129,19 @@ lvgl:
                     entity_id: button.pc_sleep
 
         # ── Redémarrer PC ───────────────────────
-        # Adapter selon ton intégration HA
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_restart_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
-                  align: top_left
+                  align: top_mid
                   text: $restart
               - label:
-                  align: bottom_left
+                  align: bottom_mid
+                  text_align: center
                   text: "Redémarrer PC"
             on_click:
               - homeassistant.service:
