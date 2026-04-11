@@ -2,18 +2,18 @@ substitutions:
   icon_font: icon_font
   button_on_color: "0xFF8C00"
   button_text_color: "0xFFFFFF"
-  button_control_color: "0x313131"
+  button_control_color: "0x1A1D2E"
   button_height: 132px
   button_width: 190px
   padding: 14px
-  radius: 8px
+  radius: 14px
 
 lvgl:
   style_definitions:
     - id: control
       bg_color: $button_control_color
       border_width: 1
-      border_color: "0x484848"
+      border_color: "0x262A3F"
       border_opa: cover
 
   theme:
@@ -31,3 +31,6 @@ lvgl:
         bg_color: $button_on_color
         text_color: $button_text_color
         border_color: $button_on_color
+        shadow_color: $button_on_color
+        shadow_width: 22
+        shadow_opa: 60%

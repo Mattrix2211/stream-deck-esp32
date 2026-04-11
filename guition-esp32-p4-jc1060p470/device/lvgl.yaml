@@ -8,6 +8,19 @@ lvgl:
   top_layer:
     widgets:
 
+      # Fond de la barre de navigation (dessiné en premier = derrière)
+      - obj:
+          id: topbar_bg
+          align: top_left
+          x: 0
+          y: 0
+          width: 100%
+          height: 46
+          bg_color: 0x141726
+          bg_opa: cover
+          border_width: 0
+          radius: 0
+
       - label:
           text: "-° / -°"
           id: temperatures
@@ -91,7 +104,7 @@ lvgl:
         pad_row: 10
         pad_column: 10
       width: 100%
-      bg_color: Black
+      bg_color: 0x0D1117
       bg_opa: cover
       pad_top: 48
       pad_bottom: 5
@@ -517,12 +530,12 @@ lvgl:
             id: side_panel
             width: 250
             height: 100%
-            bg_color: 0x111111
+            bg_color: 0x141726
             bg_opa: COVER
-            radius: 12
+            radius: 14
             pad_all: 14
             border_width: 1
-            border_color: 0x2A2A2A
+            border_color: 0x262A3F
             layout:
               type: flex
               flex_flow: column
@@ -661,9 +674,9 @@ lvgl:
                         id: color_preview
                         width: 100%
                         height: 32
-                        radius: 6
+                        radius: 8
                         border_width: 1
-                        border_color: 0x333333
+                        border_color: 0x262A3F
                         bg_color: 0xFFFFFF
 
                     - label:
@@ -801,7 +814,7 @@ lvgl:
         pad_row: 10
         pad_column: 10
       width: 100%
-      bg_color: Black
+      bg_color: 0x0D1117
       bg_opa: cover
       pad_top: 48
       pad_bottom: 5
