@@ -808,8 +808,8 @@ lvgl:
 
         # ── Tout éteindre ───────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: all_lights_off_btn
             styles: control
             widgets:
@@ -872,8 +872,8 @@ lvgl:
 
         # ── Tout allumer ────────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: all_lights_on_btn
             styles: control
             widgets:
@@ -936,8 +936,8 @@ lvgl:
 
         # ── Allumer le PC ───────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_wake_btn
             styles: control
             widgets:
@@ -956,8 +956,8 @@ lvgl:
 
         # ── Éteindre le PC ──────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_shutdown_btn
             styles: control
             widgets:
@@ -976,8 +976,8 @@ lvgl:
 
         # ── Veille PC ───────────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_sleep_btn
             styles: control
             widgets:
@@ -996,8 +996,8 @@ lvgl:
 
         # ── Redémarrer PC ───────────────────────
         - button:
-            height: $button_height
-            width: $button_width
+            height: 200
+            width: 340
             id: pc_restart_btn
             styles: control
             widgets:
