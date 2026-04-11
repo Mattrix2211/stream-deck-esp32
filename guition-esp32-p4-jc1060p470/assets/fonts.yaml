@@ -18,7 +18,7 @@ font:
 
   - file: "gfonts://Roboto"
     id: clockbar_font
-    size: 20
+    size: 24
     bpp: 8
     extras:
       - file: "gfonts://Roboto"

@@ -2,6 +2,26 @@ lvgl:
   displays: my_display
   byte_order: little_endian
 
+  # Couleurs d'ambiance par pièce (état éteint)
+  # L'état allumé vient du thème (glow orange) ou de la couleur réelle (RGB)
+  style_definitions:
+    - id: room_office
+      bg_color: "0x0A1A2E"   # bleu travail — bureau
+    - id: room_bedroom
+      bg_color: "0x1A0A2E"   # violet sommeil — chambre
+    - id: room_living
+      bg_color: "0x261608"   # ambre chaud — salon / salle à manger
+    - id: room_utility
+      bg_color: "0x081E1A"   # sarcelle propre — cuisine / salle de bain
+    - id: room_hallway
+      bg_color: "0x10111E"   # bleu-gris neutre — couloir
+    - id: scene_lights_off
+      bg_color: "0x280808"   # rouge sombre — tout éteindre
+    - id: scene_lights_on
+      bg_color: "0x261808"   # ambre chaud — tout allumer
+    - id: scene_pc
+      bg_color: "0x08101E"   # bleu tech — actions PC
+
   # ─────────────────────────────────────────────────────────────
   # COUCHE SUPÉRIEURE — visible sur toutes les pages
   # ─────────────────────────────────────────────────────────────
@@ -26,19 +46,19 @@ lvgl:
           id: temperatures
           text_font: clockbar_font
           align: top_left
-          x: 8
-          y: 8
-          text_color: 0xFFFFFF
+          x: 26
+          y: 11
+          text_color: 0xC8D0E0
 
       # Pastille connexion HA (verte = OK, rouge = déconnecté)
       - obj:
           id: conn_indicator
           align: top_left
-          x: 8
-          y: 34
-          width: 10
-          height: 10
-          radius: 5
+          x: 10
+          y: 17
+          width: 12
+          height: 12
+          radius: 6
           bg_color: 0x00BB44
           bg_opa: COVER
           border_width: 0
@@ -49,7 +69,7 @@ lvgl:
           text_font: clockbar_font
           align: top_mid
           x: 0
-          y: 8
+          y: 11
           text_align: center
           text_color: 0xFFFFFF
 
@@ -147,7 +167,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: bureau_light_btn
-            styles: control
+            styles: [control, room_office]
             widgets:
               - label:
                   text_font: $icon_font
@@ -179,7 +199,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: fado_bureau_light_btn
-            styles: control
+            styles: [control, room_office]
             widgets:
               - label:
                   text_font: $icon_font
@@ -211,7 +231,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: chambre_light_btn
-            styles: control
+            styles: [control, room_bedroom]
             widgets:
               - label:
                   text_font: $icon_font
@@ -243,7 +263,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: led_chambre_light_btn
-            styles: control
+            styles: [control, room_bedroom]
             widgets:
               - label:
                   text_font: $icon_font
@@ -275,7 +295,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: salon_light_btn
-            styles: control
+            styles: [control, room_living]
             widgets:
               - label:
                   text_font: $icon_font
@@ -307,7 +327,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: salle_manger_light_btn
-            styles: control
+            styles: [control, room_living]
             widgets:
               - label:
                   text_font: $icon_font
@@ -339,7 +359,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: la_boule_light_btn
-            styles: control
+            styles: [control, room_living]
             widgets:
               - label:
                   text_font: $icon_font
@@ -371,7 +391,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: salle_bain_light_btn
-            styles: control
+            styles: [control, room_utility]
             widgets:
               - label:
                   text_font: $icon_font
@@ -403,7 +423,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: cuisine_light_btn
-            styles: control
+            styles: [control, room_utility]
             widgets:
               - label:
                   text_font: $icon_font
@@ -435,7 +455,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: led_cuisine_light_btn
-            styles: control
+            styles: [control, room_utility]
             widgets:
               - label:
                   text_font: $icon_font
@@ -467,7 +487,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: couloir_light_btn
-            styles: control
+            styles: [control, room_hallway]
             widgets:
               - label:
                   text_font: $icon_font
@@ -499,7 +519,7 @@ lvgl:
             width: $button_width
             checkable: true
             id: lampe_couloir_btn
-            styles: control
+            styles: [control, room_hallway]
             widgets:
               - label:
                   text_font: $icon_font
@@ -551,6 +571,15 @@ lvgl:
                   long_mode: wrap
                   width: 100%
 
+              # Séparateur horizontal
+              - obj:
+                  width: 100%
+                  height: 1
+                  bg_color: 0x262A3F
+                  bg_opa: COVER
+                  border_width: 0
+                  pad_all: 0
+
               # Switch toggle — style interrupteur
               # Désactivé tant qu'aucune lampe n'est sélectionnée
               # on_value : turn_on/turn_off (idempotent, évite les conflits)
@@ -577,7 +606,7 @@ lvgl:
               - label:
                   id: selected_light_brightness
                   text: "Lum : --"
-                  text_color: 0xAAAAAA
+                  text_color: 0x8892B0
 
               # Slider luminosité (0-100%)
               - slider:
@@ -617,7 +646,7 @@ lvgl:
 
                     - label:
                         text: "Température"
-                        text_color: 0xAAAAAA
+                        text_color: 0x8892B0
 
                     # Gradient chaud→froid + slider transparent superposé
                     - obj:
@@ -681,7 +710,7 @@ lvgl:
 
                     - label:
                         text: "Teinte"
-                        text_color: 0xAAAAAA
+                        text_color: 0x8892B0
 
                     # Arc-en-ciel : image de fond + slider transparent superposé
                     - obj:
@@ -745,7 +774,7 @@ lvgl:
 
                     - label:
                         text: "Saturation"
-                        text_color: 0xAAAAAA
+                        text_color: 0x8892B0
 
                     # Slider saturation (0-100%)
                     - slider:
@@ -836,7 +865,7 @@ lvgl:
             height: 200
             width: 340
             id: all_lights_off_btn
-            styles: control
+            styles: [control, scene_lights_off]
             widgets:
               - label:
                   text_font: $icon_font
@@ -901,7 +930,7 @@ lvgl:
             height: 200
             width: 340
             id: all_lights_on_btn
-            styles: control
+            styles: [control, scene_lights_on]
             widgets:
               - label:
                   text_font: $icon_font
@@ -966,7 +995,7 @@ lvgl:
             height: 200
             width: 340
             id: pc_wake_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
@@ -987,7 +1016,7 @@ lvgl:
             height: 200
             width: 340
             id: pc_shutdown_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
@@ -1008,7 +1037,7 @@ lvgl:
             height: 200
             width: 340
             id: pc_sleep_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
@@ -1029,7 +1058,7 @@ lvgl:
             height: 200
             width: 340
             id: pc_restart_btn
-            styles: control
+            styles: [control, scene_pc]
             widgets:
               - label:
                   text_font: $icon_font
