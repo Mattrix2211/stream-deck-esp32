@@ -623,6 +623,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c58b8f2") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : Led cuisine ────────────────────────────────────
@@ -652,6 +653,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010d0b3aa9") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : Chambre ampoule ────────────────────────────────
@@ -681,6 +683,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c014263") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : La boule ───────────────────────────────────────
@@ -710,6 +713,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.la_boule") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : Fado bureau ────────────────────────────────────
@@ -739,6 +743,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8ba13") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : Salle à manger ─────────────────────────────────
@@ -768,6 +773,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8c061") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : Salon ──────────────────────────────────────────
@@ -797,6 +803,7 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x00178801062d1c11") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }
 
   # ── RGB : Salle de bain ──────────────────────────────────
@@ -826,4 +833,5 @@ text_sensor:
           if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c0adbc8") {
             lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
             lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+            lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(color), LV_PART_MAIN);
           }

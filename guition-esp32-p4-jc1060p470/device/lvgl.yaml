@@ -544,6 +544,16 @@ lvgl:
                     pad_row: 8
                   widgets:
 
+                    # Aperçu couleur en temps réel
+                    - obj:
+                        id: color_preview
+                        width: 100%
+                        height: 32
+                        radius: 6
+                        border_width: 1
+                        border_color: 0x333333
+                        bg_color: 0xFFFFFF
+
                     - label:
                         text: "Teinte"
                         text_color: 0xAAAAAA
@@ -556,12 +566,31 @@ lvgl:
                         min_value: 0
                         max_value: 360
                         value: 0
+                        on_value:
+                          - lambda: |-
+                              id(sel_hue) = lv_slider_get_value(id(hue_slider));
+                              int h = id(sel_hue), s = id(sel_sat);
+                              float hf = h / 60.0f;
+                              float sf = s / 100.0f;
+                              int hi = (int)hf % 6;
+                              float f = hf - (int)hf;
+                              float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                              float r, g, b;
+                              switch(hi) {
+                                case 0: r=1;g=t;b=p; break;
+                                case 1: r=q;g=1;b=p; break;
+                                case 2: r=p;g=1;b=t; break;
+                                case 3: r=p;g=q;b=1; break;
+                                case 4: r=t;g=p;b=1; break;
+                                default: r=1;g=p;b=q; break;
+                              }
+                              uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                              lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
                         on_release:
                           - if:
                               condition:
                                 lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
                               then:
-                                - lambda: 'id(sel_hue) = lv_slider_get_value(id(hue_slider));'
                                 - homeassistant.service:
                                     service: light.turn_on
                                     data_template:
@@ -584,12 +613,31 @@ lvgl:
                         min_value: 0
                         max_value: 100
                         value: 100
+                        on_value:
+                          - lambda: |-
+                              id(sel_sat) = lv_slider_get_value(id(sat_slider));
+                              int h = id(sel_hue), s = id(sel_sat);
+                              float hf = h / 60.0f;
+                              float sf = s / 100.0f;
+                              int hi = (int)hf % 6;
+                              float f = hf - (int)hf;
+                              float p = 1.0f - sf, q = 1.0f - f*sf, t = 1.0f - (1.0f-f)*sf;
+                              float r, g, b;
+                              switch(hi) {
+                                case 0: r=1;g=t;b=p; break;
+                                case 1: r=q;g=1;b=p; break;
+                                case 2: r=p;g=1;b=t; break;
+                                case 3: r=p;g=q;b=1; break;
+                                case 4: r=t;g=p;b=1; break;
+                                default: r=1;g=p;b=q; break;
+                              }
+                              uint32_t c=((uint32_t)(r*255)<<16)|((uint32_t)(g*255)<<8)|(uint32_t)(b*255);
+                              lv_obj_set_style_bg_color(id(color_preview), lv_color_hex(c), LV_PART_MAIN);
                         on_release:
                           - if:
                               condition:
                                 lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
                               then:
-                                - lambda: 'id(sel_sat) = lv_slider_get_value(id(sat_slider));'
                                 - homeassistant.service:
                                     service: light.turn_on
                                     data_template:
