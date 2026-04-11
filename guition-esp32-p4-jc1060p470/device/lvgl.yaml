@@ -122,6 +122,7 @@ lvgl:
                   display_name: "Bureau"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: false
 
         # ── Fado bureau ─────────────────────────
         - button:
@@ -151,6 +152,7 @@ lvgl:
                   display_name: "Fado bureau"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Chambre ─────────────────────────────
         - button:
@@ -180,6 +182,7 @@ lvgl:
                   display_name: "Chambre"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Led chambre ─────────────────────────
         - button:
@@ -209,6 +212,7 @@ lvgl:
                   display_name: "Led chambre"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Salon ───────────────────────────────
         - button:
@@ -238,6 +242,7 @@ lvgl:
                   display_name: "Salon"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Salle à manger ──────────────────────
         - button:
@@ -267,6 +272,7 @@ lvgl:
                   display_name: "Salle à manger"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── La boule ────────────────────────────
         - button:
@@ -296,6 +302,7 @@ lvgl:
                   display_name: "La boule"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Salle de bain ───────────────────────
         - button:
@@ -325,6 +332,7 @@ lvgl:
                   display_name: "Salle de bain"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Cuisine ─────────────────────────────
         - button:
@@ -354,6 +362,7 @@ lvgl:
                   display_name: "Cuisine"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: false
 
         # ── Led cuisine ─────────────────────────
         - button:
@@ -383,6 +392,7 @@ lvgl:
                   display_name: "Led cuisine"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: true
 
         # ── Couloir ─────────────────────────────
         - button:
@@ -412,6 +422,7 @@ lvgl:
                   display_name: "Couloir"
                   is_dimmable: true
                   is_switch: false
+                  is_rgb: false
 
         # ── Lampe couloir (prise) ───────────────
         - button:
@@ -441,6 +452,7 @@ lvgl:
                   display_name: "Lampe couloir"
                   is_dimmable: false
                   is_switch: true
+                  is_rgb: false
 
         # ── Panneau de contrôle ─────────────────
         - obj:
@@ -496,63 +508,90 @@ lvgl:
                   text: "Lum : --"
                   text_color: 0xAAAAAA
 
-              # Presets luminosité
+              # Slider luminosité (0-100%)
+              - slider:
+                  id: brightness_slider
+                  width: 100%
+                  height: 20
+                  min_value: 0
+                  max_value: 100
+                  value: 0
+                  state:
+                    disabled: true
+                  on_release:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
+                        then:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: !lambda 'return id(selected_light);'
+                                brightness_pct: !lambda 'return lv_slider_get_value(id(brightness_slider));'
+
+              # Section couleur (visible uniquement pour les ampoules RGB)
               - obj:
+                  id: color_section
                   width: 100%
                   height: SIZE_CONTENT
                   bg_opa: TRANSP
                   border_width: 0
                   pad_all: 0
+                  hidden: true
                   layout:
                     type: flex
-                    flex_flow: row
-                    pad_column: 6
+                    flex_flow: column
+                    pad_row: 8
                   widgets:
-                    - button:
-                        id: quick_25_button
-                        height: 44
-                        width: 64
-                        styles: control
-                        state:
-                          disabled: true
-                        on_click:
-                          - script.execute:
-                              id: set_selected_light_brightness
-                              brightness_pct: 25
-                        widgets:
-                          - label:
-                              text: "25%"
-                              align: center
-                    - button:
-                        id: quick_50_button
-                        height: 44
-                        width: 64
-                        styles: control
-                        state:
-                          disabled: true
-                        on_click:
-                          - script.execute:
-                              id: set_selected_light_brightness
-                              brightness_pct: 50
-                        widgets:
-                          - label:
-                              text: "50%"
-                              align: center
-                    - button:
-                        id: quick_100_button
-                        height: 44
-                        width: 64
-                        styles: control
-                        state:
-                          disabled: true
-                        on_click:
-                          - script.execute:
-                              id: set_selected_light_brightness
-                              brightness_pct: 100
-                        widgets:
-                          - label:
-                              text: "100%"
-                              align: center
+
+                    - label:
+                        text: "Teinte"
+                        text_color: 0xAAAAAA
+
+                    # Slider teinte (0-360°)
+                    - slider:
+                        id: hue_slider
+                        width: 100%
+                        height: 20
+                        min_value: 0
+                        max_value: 360
+                        value: 0
+                        on_release:
+                          - if:
+                              condition:
+                                lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                              then:
+                                - homeassistant.service:
+                                    service: light.turn_on
+                                    data:
+                                      entity_id: !lambda 'return id(selected_light);'
+                                      hs_color: !lambda |-
+                                        return {(float)lv_slider_get_value(id(hue_slider)), (float)id(sel_sat)};
+
+                    - label:
+                        text: "Saturation"
+                        text_color: 0xAAAAAA
+
+                    # Slider saturation (0-100%)
+                    - slider:
+                        id: sat_slider
+                        width: 100%
+                        height: 20
+                        min_value: 0
+                        max_value: 100
+                        value: 100
+                        on_release:
+                          - if:
+                              condition:
+                                lambda: 'return id(selected_light_valid) && id(selected_light_is_rgb);'
+                              then:
+                                - lambda: 'id(sel_sat) = lv_slider_get_value(id(sat_slider));'
+                                - homeassistant.service:
+                                    service: light.turn_on
+                                    data:
+                                      entity_id: !lambda 'return id(selected_light);'
+                                      hs_color: !lambda |-
+                                        return {(float)id(sel_hue), (float)lv_slider_get_value(id(sat_slider))};
 
               # Effacer la sélection
               - button:

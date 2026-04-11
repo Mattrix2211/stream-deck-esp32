@@ -23,6 +23,18 @@ globals:
     type: bool
     restore_value: false
     initial_value: "false"
+  - id: selected_light_is_rgb
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: sel_hue
+    type: int
+    restore_value: false
+    initial_value: "0"
+  - id: sel_sat
+    type: int
+    restore_value: false
+    initial_value: "100"
 
 script:
   # Réinitialise le panneau — aucune lampe sélectionnée
@@ -35,6 +47,7 @@ script:
           id(selected_light_is_switch) = false;
           id(selected_light_valid) = false;
           id(selected_light_is_on) = false;
+          id(selected_light_is_rgb) = false;
       - lvgl.label.update:
           id: selected_light_title
           text: "Sélectionner\nune lumière"
@@ -45,14 +58,11 @@ script:
           id: light_toggle_switch
           state: { checked: false, disabled: true }
       - lvgl.widget.update:
-          id: quick_25_button
+          id: brightness_slider
           state: { disabled: true }
       - lvgl.widget.update:
-          id: quick_50_button
-          state: { disabled: true }
-      - lvgl.widget.update:
-          id: quick_100_button
-          state: { disabled: true }
+          id: color_section
+          hidden: true
 
   # Sélectionne une lampe — appel depuis on_long_press
   - id: select_light_context
@@ -61,6 +71,7 @@ script:
       display_name: string
       is_dimmable: bool
       is_switch: bool
+      is_rgb: bool
     then:
       - lambda: |-
           id(selected_light) = entity_id;
@@ -68,6 +79,7 @@ script:
           id(selected_light_is_dimmable) = is_dimmable;
           id(selected_light_is_switch) = is_switch;
           id(selected_light_valid) = true;
+          id(selected_light_is_rgb) = is_rgb;
       - lvgl.label.update:
           id: selected_light_title
           text:
@@ -82,17 +94,28 @@ script:
           condition:
             lambda: 'return is_dimmable;'
           then:
-            - lvgl.widget.update: { id: quick_25_button, state: { disabled: false } }
-            - lvgl.widget.update: { id: quick_50_button, state: { disabled: false } }
-            - lvgl.widget.update: { id: quick_100_button, state: { disabled: false } }
+            - lvgl.widget.update:
+                id: brightness_slider
+                state: { disabled: false }
             - lvgl.label.update: { id: selected_light_brightness, text: "Lum : --" }
           else:
-            - lvgl.widget.update: { id: quick_25_button, state: { disabled: true } }
-            - lvgl.widget.update: { id: quick_50_button, state: { disabled: true } }
-            - lvgl.widget.update: { id: quick_100_button, state: { disabled: true } }
+            - lvgl.widget.update:
+                id: brightness_slider
+                state: { disabled: true }
             - lvgl.label.update: { id: selected_light_brightness, text: "Lum : N/A" }
+      - if:
+          condition:
+            lambda: 'return is_rgb;'
+          then:
+            - lvgl.widget.update:
+                id: color_section
+                hidden: false
+          else:
+            - lvgl.widget.update:
+                id: color_section
+                hidden: true
 
-  # Applique un preset de luminosité sur la lampe sélectionnée
+  # Applique un preset de luminosité sur la lampe sélectionnée (gardé pour compatibilité)
   - id: set_selected_light_brightness
     parameters:
       brightness_pct: int
@@ -319,7 +342,7 @@ binary_sensor:
 
 
 # ─────────────────────────────────────────────────────────────
-# LUMINOSITÉ → panneau (uniquement si lampe sélectionnée)
+# LUMINOSITÉ → panneau (label + slider si sélectionné)
 # ─────────────────────────────────────────────────────────────
 sensor:
 
@@ -340,6 +363,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: fado_bureau_brightness
@@ -358,6 +382,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: chambre_brightness
@@ -376,6 +401,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: led_chambre_brightness
@@ -394,6 +420,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: salon_brightness
@@ -412,6 +439,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: salle_manger_brightness
@@ -430,6 +458,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: la_boule_brightness
@@ -448,6 +477,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: salle_bain_brightness
@@ -466,6 +496,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: cuisine_brightness
@@ -484,6 +515,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: led_cuisine_brightness
@@ -502,6 +534,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: couloir_brightness
@@ -520,6 +553,7 @@ sensor:
                 text:
                   format: "Lum : %.0f%%"
                   args: [ x ]
+            - lambda: 'lv_slider_set_value(id(brightness_slider), (int)x, LV_ANIM_OFF);'
 
   - platform: homeassistant
     id: indoor_temperature
@@ -547,7 +581,7 @@ sensor:
 
 
 # ─────────────────────────────────────────────────────────────
-# HORLOGE
+# HORLOGE + COULEURS RGB
 # ─────────────────────────────────────────────────────────────
 text_sensor:
   - platform: homeassistant
@@ -560,3 +594,236 @@ text_sensor:
           text:
             format: "%s"
             args: [ x.c_str() ]
+
+  # ── RGB : Led chambre ────────────────────────────────────
+  - platform: homeassistant
+    id: led_chambre_rgb
+    entity_id: light.0x001788010c58b8f2
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(led_chambre_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          // RGB → HSV pour les sliders
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c58b8f2") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : Led cuisine ────────────────────────────────────
+  - platform: homeassistant
+    id: led_cuisine_rgb
+    entity_id: light.0x001788010d0b3aa9
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(led_cuisine_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010d0b3aa9") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : Chambre ampoule ────────────────────────────────
+  - platform: homeassistant
+    id: chambre_rgb
+    entity_id: light.0x001788010c014263
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(chambre_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c014263") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : La boule ───────────────────────────────────────
+  - platform: homeassistant
+    id: la_boule_rgb
+    entity_id: light.la_boule
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(la_boule_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.la_boule") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : Fado bureau ────────────────────────────────────
+  - platform: homeassistant
+    id: fado_bureau_rgb
+    entity_id: light.0x001788010dc8ba13
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(fado_bureau_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8ba13") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : Salle à manger ─────────────────────────────────
+  - platform: homeassistant
+    id: salle_manger_rgb
+    entity_id: light.0x001788010dc8c061
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(salle_manger_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010dc8c061") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : Salon ──────────────────────────────────────────
+  - platform: homeassistant
+    id: salon_rgb
+    entity_id: light.0x00178801062d1c11
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(salon_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x00178801062d1c11") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
+
+  # ── RGB : Salle de bain ──────────────────────────────────
+  - platform: homeassistant
+    id: salle_bain_rgb
+    entity_id: light.0x001788010c0adbc8
+    attribute: rgb_color
+    internal: true
+    on_value:
+      - lambda: |-
+          std::string s = x;
+          for (auto &c : s) if (c=='['||c==']'||c=='('||c==')') c=' ';
+          for (auto &c : s) if (c==',') c=' ';
+          int r=255, g=255, b=255;
+          sscanf(s.c_str(), "%d %d %d", &r, &g, &b);
+          uint32_t color = ((uint32_t)r<<16)|((uint32_t)g<<8)|b;
+          lv_obj_set_style_bg_color(id(salle_bain_light_btn), lv_color_hex(color), LV_PART_MAIN | LV_STATE_CHECKED);
+          float rf=r/255.0f, gf=g/255.0f, bf=b/255.0f;
+          float cmax=std::max({rf,gf,bf}), cmin=std::min({rf,gf,bf}), diff=cmax-cmin;
+          float h=0, s=(cmax>0.001f)?(diff/cmax):0;
+          if (diff>0.001f) {
+            if (cmax==rf) h=fmod(60*(gf-bf)/diff+360,360);
+            else if (cmax==gf) h=60*(bf-rf)/diff+120;
+            else h=60*(rf-gf)/diff+240;
+          }
+          id(sel_hue)=(int)h; id(sel_sat)=(int)(s*100);
+          if (id(selected_light_valid) && id(selected_light)=="light.0x001788010c0adbc8") {
+            lv_slider_set_value(id(hue_slider), id(sel_hue), LV_ANIM_OFF);
+            lv_slider_set_value(id(sat_slider), id(sel_sat), LV_ANIM_OFF);
+          }
