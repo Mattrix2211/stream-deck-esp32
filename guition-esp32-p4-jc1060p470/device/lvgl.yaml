@@ -128,9 +128,7 @@ lvgl:
             id: nav_scenes_btn
             state: { checked: false }
       on_gesture:
-        direction: left
-        then:
-          - lvgl.page.show: scenes_page
+        - lvgl.page.show: scenes_page
 
       widgets:
 
@@ -546,9 +544,7 @@ lvgl:
             state: { checked: true }
         - script.execute: reset_light_context
       on_gesture:
-        direction: right
-        then:
-          - lvgl.page.show: lights_page
+        - lvgl.page.show: lights_page
 
       widgets:
 
@@ -810,9 +806,7 @@ lvgl:
             lv_obj_set_style_border_width(id(color_temp_slider), 2, LV_PART_KNOB);
             lv_obj_set_style_pad_all(id(color_temp_slider), 7, LV_PART_KNOB);
       on_gesture:
-        direction: right
-        then:
-          - lvgl.page.show: lights_page
+        - lvgl.page.show: lights_page
 
       widgets:
 
