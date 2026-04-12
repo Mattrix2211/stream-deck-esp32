@@ -114,11 +114,11 @@ lvgl:
       widgets:
 
         # ── Conteneur des boutons lumières ─────────────────────
-        # flex_grow:1 absorbe tout l'espace disponible (≈820px)
-        # column_wrap : 4 colonnes × 3 lignes = 12 boutons
+        # width calculée : 1050 (contenu page) - 10 (gap) - 220 (panel) = 820px
+        # column_wrap : 4 colonnes × 3 lignes = 12 boutons (197×130px)
         - obj:
             id: btn_area
-            flex_grow: 1
+            width: 820
             height: 100%
             bg_opa: TRANSP
             border_width: 0
