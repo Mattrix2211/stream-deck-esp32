@@ -29,6 +29,15 @@ font:
       "\U000F0280",  # mdi-emoticon-happy-outline
       ]
 
+  - file: 'https://github.com/Templarian/MaterialDesign-Webfont/raw/v7.4.47/fonts/materialdesignicons-webfont.ttf'
+    id: nav_icon_font
+    size: 24
+    bpp: 8
+    glyphs: [
+      "\U000F0335",  # mdi-lightbulb
+      "\U000F0379",  # mdi-monitor
+      ]
+
 # Map icons to names
 substitutions:
   lightbulb:      "\U000F0335"
@@ -52,3 +61,4 @@ substitutions:
   bed:            "\U000F02CB"
   fork_knife:     "\U000F0E52"
   happy:          "\U000F0280"
+  monitor:        "\U000F0379"
