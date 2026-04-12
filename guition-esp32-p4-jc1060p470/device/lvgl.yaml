@@ -570,7 +570,7 @@ lvgl:
                     - button:
                         id: quick_25_button
                         height: 36
-                        flex_grow: 1
+                        width: 60
                         styles: control
                         state:
                           disabled: true
@@ -585,7 +585,7 @@ lvgl:
                     - button:
                         id: quick_50_button
                         height: 36
-                        flex_grow: 1
+                        width: 60
                         styles: control
                         state:
                           disabled: true
@@ -600,7 +600,7 @@ lvgl:
                     - button:
                         id: quick_100_button
                         height: 36
-                        flex_grow: 1
+                        width: 60
                         styles: control
                         state:
                           disabled: true
