@@ -29,56 +29,63 @@ lvgl:
           text_align: center
           text_color: 0xFFFFFF
 
-      # Tab — Lumières (actif par défaut)
+      # Tab — Lumières (icône ampoule)
       - button:
           id: nav_lights_btn
           align: top_right
-          x: -218
+          x: -122
           y: 4
           height: 34
-          width: 104
+          width: 52
           checkable: true
           styles: control
+          pad_top: 4
+          pad_bottom: 4
+          pad_left: 4
+          pad_right: 4
           on_click:
             - lvgl.page.show: lights_page
           widgets:
             - label:
-                text: "Lumières"
+                text: $lightbulb
+                text_font: nav_icon_font
                 align: center
-                text_font: label_font
                 text_color: 0xFFFFFF
 
-      # Tab — Scènes
+      # Tab — Scènes (icône moniteur)
       - button:
           id: nav_scenes_btn
           align: top_right
-          x: -108
+          x: -60
           y: 4
           height: 34
-          width: 100
+          width: 52
           checkable: true
           styles: control
+          pad_top: 4
+          pad_bottom: 4
+          pad_left: 4
+          pad_right: 4
           on_click:
             - lvgl.page.show: scenes_page
           widgets:
             - label:
-                text: "Scènes"
+                text: $monitor
+                text_font: nav_icon_font
                 align: center
-                text_font: label_font
                 text_color: 0xFFFFFF
 
   pages:
 
-    # ═════════════════════════════════════════════
+    # ═══════════════════════════════════════════════════════════
     # PAGE 1 — LUMIÈRES
-    # Grille de 12 boutons + panneau de contrôle
-    # Appui court : toggle | Appui long : sélection
-    # ═════════════════════════════════════════════
+    # Conteneur gauche (btn_area, flex_grow:1) + panneau latéral
+    # Appui court : toggle | Appui long : sélection dans le volet
+    # ═══════════════════════════════════════════════════════════
     - id: lights_page
       layout:
         type: flex
-        flex_flow: column_wrap
-        pad_row: 10
+        flex_flow: row
         pad_column: 10
       width: 100%
       bg_color: Black
@@ -94,363 +101,387 @@ lvgl:
         - lvgl.widget.update:
             id: nav_scenes_btn
             state: { checked: false }
+        - lambda: |-
+            lv_obj_clear_flag(id(lights_page), LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_clear_flag(id(btn_area), LV_OBJ_FLAG_SCROLLABLE);
+            lv_obj_add_flag(id(color_temp_section), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(id(color_section), LV_OBJ_FLAG_HIDDEN);
+            lv_obj_set_style_bg_opa(id(color_temp_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_color(id(color_temp_slider), lv_color_white(), LV_PART_KNOB);
+            lv_obj_set_style_bg_opa(id(hue_slider), LV_OPA_TRANSP, LV_PART_MAIN);
+            lv_obj_set_style_bg_color(id(hue_slider), lv_color_white(), LV_PART_KNOB);
 
       widgets:
 
-        # ── Bureau ──────────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: bureau_light_btn
-            styles: control
+        # ── Conteneur des boutons lumières ─────────────────────
+        # flex_grow:1 absorbe tout l'espace disponible (≈820px)
+        # column_wrap : 4 colonnes × 3 lignes = 12 boutons
+        - obj:
+            id: btn_area
+            flex_grow: 1
+            height: 100%
+            bg_opa: TRANSP
+            border_width: 0
+            pad_all: 0
+            layout:
+              type: flex
+              flex_flow: column_wrap
+              pad_row: 10
+              pad_column: 10
             widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
-              - label:
-                  align: bottom_left
-                  text: "Bureau"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.ampoule_bureau
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.ampoule_bureau"
-                  display_name: "Bureau"
-                  is_dimmable: true
-                  is_switch: false
 
-        # ── Fado bureau ─────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: fado_bureau_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $nightlight
-              - label:
-                  align: bottom_left
-                  text: "Fado bureau"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010dc8ba13
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010dc8ba13"
-                  display_name: "Fado bureau"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Bureau ────────────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: bureau_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $lightbulb
+                    - label:
+                        align: bottom_left
+                        text: "Bureau"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.ampoule_bureau
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.ampoule_bureau"
+                        display_name: "Bureau"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Chambre ─────────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: chambre_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $bed
-              - label:
-                  align: bottom_left
-                  text: "Chambre"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010c014263
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010c014263"
-                  display_name: "Chambre"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Fado bureau ───────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: fado_bureau_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $nightlight
+                    - label:
+                        align: bottom_left
+                        text: "Fado bureau"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010dc8ba13
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010dc8ba13"
+                        display_name: "Fado bureau"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Led chambre ─────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: led_chambre_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $ledstrip
-              - label:
-                  align: bottom_left
-                  text: "Led chambre"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010c58b8f2
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010c58b8f2"
-                  display_name: "Led chambre"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Chambre ───────────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: chambre_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $bed
+                    - label:
+                        align: bottom_left
+                        text: "Chambre"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010c014263
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010c014263"
+                        display_name: "Chambre"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Salon ───────────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: salon_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $sofa
-              - label:
-                  align: bottom_left
-                  text: "Salon"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x00178801062d1c11
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x00178801062d1c11"
-                  display_name: "Salon"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Led chambre ───────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: led_chambre_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $ledstrip
+                    - label:
+                        align: bottom_left
+                        text: "Led chambre"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010c58b8f2
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010c58b8f2"
+                        display_name: "Led chambre"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Salle à manger ──────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: salle_manger_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $fork_knife
-              - label:
-                  align: bottom_left
-                  text: "Salle à manger"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010dc8c061
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010dc8c061"
-                  display_name: "Salle à manger"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Salon ─────────────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: salon_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $sofa
+                    - label:
+                        align: bottom_left
+                        text: "Salon"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x00178801062d1c11
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x00178801062d1c11"
+                        display_name: "Salon"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── La boule ────────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: la_boule_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
-              - label:
-                  align: bottom_left
-                  text: "La boule"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.la_boule
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.la_boule"
-                  display_name: "La boule"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Salle à manger ────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: salle_manger_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $fork_knife
+                    - label:
+                        align: bottom_left
+                        text: "Salle à manger"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010dc8c061
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010dc8c061"
+                        display_name: "Salle à manger"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Salle de bain ───────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: salle_bain_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
-              - label:
-                  align: bottom_left
-                  text: "Salle de bain"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010c0adbc8
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010c0adbc8"
-                  display_name: "Salle de bain"
-                  is_dimmable: true
-                  is_switch: false
+              # ── La boule ──────────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: la_boule_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $lightbulb
+                    - label:
+                        align: bottom_left
+                        text: "La boule"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.la_boule
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.la_boule"
+                        display_name: "La boule"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Cuisine ─────────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: cuisine_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
-              - label:
-                  align: bottom_left
-                  text: "Cuisine"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010c2dee03
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010c2dee03"
-                  display_name: "Cuisine"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Salle de bain ─────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: salle_bain_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $lightbulb
+                    - label:
+                        align: bottom_left
+                        text: "Salle de bain"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010c0adbc8
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010c0adbc8"
+                        display_name: "Salle de bain"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Led cuisine ─────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: led_cuisine_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $ledstrip
-              - label:
-                  align: bottom_left
-                  text: "Led cuisine"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010d0b3aa9
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010d0b3aa9"
-                  display_name: "Led cuisine"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Cuisine ───────────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: cuisine_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $lightbulb
+                    - label:
+                        align: bottom_left
+                        text: "Cuisine"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010c2dee03
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010c2dee03"
+                        display_name: "Cuisine"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Couloir ─────────────────────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: couloir_light_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
-              - label:
-                  align: bottom_left
-                  text: "Couloir"
-            on_click:
-              - homeassistant.service:
-                  service: light.toggle
-                  data:
-                    entity_id: light.0x001788010c2de07e
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "light.0x001788010c2de07e"
-                  display_name: "Couloir"
-                  is_dimmable: true
-                  is_switch: false
+              # ── Led cuisine ───────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: led_cuisine_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $ledstrip
+                    - label:
+                        align: bottom_left
+                        text: "Led cuisine"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010d0b3aa9
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010d0b3aa9"
+                        display_name: "Led cuisine"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Lampe couloir (prise) ───────────────
-        - button:
-            height: $button_height
-            width: $button_width
-            checkable: true
-            id: lampe_couloir_btn
-            styles: control
-            widgets:
-              - label:
-                  text_font: $icon_font
-                  align: top_left
-                  text: $lightbulb
-              - label:
-                  align: bottom_left
-                  text: "Lampe couloir"
-            on_click:
-              - homeassistant.service:
-                  service: switch.toggle
-                  data:
-                    entity_id: switch.lampe_couloir
-            on_long_press:
-              - script.execute:
-                  id: select_light_context
-                  entity_id: "switch.lampe_couloir"
-                  display_name: "Lampe couloir"
-                  is_dimmable: false
-                  is_switch: true
+              # ── Couloir ───────────────────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: couloir_light_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $lightbulb
+                    - label:
+                        align: bottom_left
+                        text: "Couloir"
+                  on_click:
+                    - homeassistant.service:
+                        service: light.toggle
+                        data:
+                          entity_id: light.0x001788010c2de07e
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "light.0x001788010c2de07e"
+                        display_name: "Couloir"
+                        is_dimmable: true
+                        is_switch: false
 
-        # ── Panneau de contrôle ─────────────────
-        # Toujours visible. Appui long sur une tuile
-        # pour la sélectionner et contrôler ici.
+              # ── Lampe couloir (prise) ─────────────────────────
+              - button:
+                  height: $button_height
+                  width: $button_width
+                  checkable: true
+                  id: lampe_couloir_btn
+                  styles: control
+                  widgets:
+                    - label:
+                        text_font: $icon_font
+                        align: top_left
+                        text: $lightbulb
+                    - label:
+                        align: bottom_left
+                        text: "Lampe couloir"
+                  on_click:
+                    - homeassistant.service:
+                        service: switch.toggle
+                        data:
+                          entity_id: switch.lampe_couloir
+                  on_long_press:
+                    - script.execute:
+                        id: select_light_context
+                        entity_id: "switch.lampe_couloir"
+                        display_name: "Lampe couloir"
+                        is_dimmable: false
+                        is_switch: true
+
+        # ── Panneau latéral ────────────────────────────────────
+        # Toujours visible. Appui long sur une tuile pour sélectionner.
         - obj:
             id: side_panel
-            width: 250
+            width: 220
             height: 100%
-            bg_color: 0x111111
-            bg_opa: COVER
-            radius: 12
-            pad_all: 14
+            bg_color: 0x141726
+            radius: 14
             border_width: 1
-            border_color: 0x2A2A2A
+            border_color: 0x262A3F
+            pad_all: 12
             layout:
               type: flex
               flex_flow: column
               flex_align_main: start
-              pad_row: 12
+              pad_row: 8
             widgets:
 
               # Titre — nom de la lampe sélectionnée
@@ -461,27 +492,70 @@ lvgl:
                   long_mode: wrap
                   width: 100%
 
-              # Bouton ON / OFF — utilise le script toggle_selected_light
-              - button:
-                  id: selected_light_toggle_button
-                  height: 48
+              # Séparateur
+              - obj:
                   width: 100%
-                  styles: control
-                  on_click:
-                    - script.execute: toggle_selected_light
+                  height: 1
+                  bg_color: 0x262A3F
+                  bg_opa: COVER
+                  border_width: 0
+                  pad_all: 0
+
+              # Rangée toggle : label + bouton ON/OFF
+              - obj:
+                  width: 100%
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  layout:
+                    type: flex
+                    flex_flow: row
+                    flex_align_main: space_between
+                    flex_align_cross: center
                   widgets:
                     - label:
-                        id: selected_light_toggle_label
-                        text: "ON / OFF"
-                        align: center
+                        text: "Allumé"
+                        text_color: 0xAAAAAA
+                    - button:
+                        id: selected_light_toggle_button
+                        height: 32
+                        width: 88
+                        styles: control
+                        on_click:
+                          - script.execute: toggle_selected_light
+                        widgets:
+                          - label:
+                              text: "ON / OFF"
+                              align: center
 
-              # Affichage luminosité actuelle
+              # Luminosité actuelle
               - label:
                   id: selected_light_brightness
                   text: "Lum : --"
                   text_color: 0xAAAAAA
+                  width: 100%
 
-              # Presets luminosité — désactivés jusqu'à sélection d'une lampe dimmable
+              # Slider luminosité (visuel + contrôle)
+              - slider:
+                  id: brightness_slider
+                  width: 100%
+                  height: 26
+                  min_value: 1
+                  max_value: 100
+                  value: 50
+                  on_value:
+                    - if:
+                        condition:
+                          lambda: 'return id(selected_light_valid) && id(selected_light_is_dimmable) && !id(selected_light_is_switch);'
+                        then:
+                          - homeassistant.service:
+                              service: light.turn_on
+                              data:
+                                entity_id: !lambda 'return id(selected_light);'
+                                brightness_pct: !lambda 'return (int)x;'
+
+              # Presets rapides de luminosité
               - obj:
                   width: 100%
                   height: SIZE_CONTENT
@@ -495,8 +569,8 @@ lvgl:
                   widgets:
                     - button:
                         id: quick_25_button
-                        height: 44
-                        width: 64
+                        height: 36
+                        flex_grow: 1
                         styles: control
                         state:
                           disabled: true
@@ -508,11 +582,10 @@ lvgl:
                           - label:
                               text: "25%"
                               align: center
-
                     - button:
                         id: quick_50_button
-                        height: 44
-                        width: 64
+                        height: 36
+                        flex_grow: 1
                         styles: control
                         state:
                           disabled: true
@@ -524,11 +597,10 @@ lvgl:
                           - label:
                               text: "50%"
                               align: center
-
                     - button:
                         id: quick_100_button
-                        height: 44
-                        width: 64
+                        height: 36
+                        flex_grow: 1
                         styles: control
                         state:
                           disabled: true
@@ -541,7 +613,65 @@ lvgl:
                               text: "100%"
                               align: center
 
-              # Bouton réinitialiser la sélection
+              # Section température de couleur (cachée par défaut)
+              - obj:
+                  id: color_temp_section
+                  width: 100%
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  layout:
+                    type: flex
+                    flex_flow: column
+                    pad_row: 4
+                  widgets:
+                    - label:
+                        text: "Température"
+                        text_color: 0xAAAAAA
+                    - slider:
+                        id: color_temp_slider
+                        width: 100%
+                        height: 26
+                        min_value: 153
+                        max_value: 500
+                        value: 300
+
+              # Section couleur (cachée par défaut)
+              - obj:
+                  id: color_section
+                  width: 100%
+                  height: SIZE_CONTENT
+                  bg_opa: TRANSP
+                  border_width: 0
+                  pad_all: 0
+                  layout:
+                    type: flex
+                    flex_flow: column
+                    pad_row: 4
+                  widgets:
+                    - label:
+                        text: "Teinte"
+                        text_color: 0xAAAAAA
+                    - slider:
+                        id: hue_slider
+                        width: 100%
+                        height: 26
+                        min_value: 0
+                        max_value: 360
+                        value: 0
+                    - label:
+                        text: "Saturation"
+                        text_color: 0xAAAAAA
+                    - slider:
+                        id: sat_slider
+                        width: 100%
+                        height: 26
+                        min_value: 0
+                        max_value: 100
+                        value: 100
+
+              # Bouton Effacer la sélection
               - button:
                   height: 36
                   width: 100%
@@ -550,15 +680,15 @@ lvgl:
                     - script.execute: reset_light_context
                   widgets:
                     - label:
-                        text: "✕ Effacer"
+                        text: "Effacer"
                         align: center
                         text_color: 0x888888
 
 
-    # ═════════════════════════════════════════════
+    # ═══════════════════════════════════════════════════════════
     # PAGE 2 — SCÈNES
     # Actions globales + activation de scènes HA
-    # ═════════════════════════════════════════════
+    # ═══════════════════════════════════════════════════════════
     - id: scenes_page
       layout:
         type: flex
@@ -580,10 +710,11 @@ lvgl:
             id: nav_scenes_btn
             state: { checked: true }
         - script.execute: reset_light_context
+        - lambda: 'lv_obj_clear_flag(id(scenes_page), LV_OBJ_FLAG_SCROLLABLE);'
 
       widgets:
 
-        # ── Tout éteindre ───────────────────────
+        # ── Tout éteindre ─────────────────────────────────────
         - button:
             height: $button_height
             width: $button_width
@@ -647,7 +778,7 @@ lvgl:
                   data:
                     entity_id: switch.lampe_couloir
 
-        # ── Tout allumer ────────────────────────
+        # ── Tout allumer ──────────────────────────────────────
         - button:
             height: $button_height
             width: $button_width
@@ -711,8 +842,7 @@ lvgl:
                   data:
                     entity_id: switch.lampe_couloir
 
-        # ── Mode soirée ─────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Mode soirée ───────────────────────────────────────
         - button:
             height: $button_height
             width: $button_width
@@ -732,8 +862,7 @@ lvgl:
                   data:
                     entity_id: scene.soiree
 
-        # ── Mode nuit ───────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Mode nuit ─────────────────────────────────────────
         - button:
             height: $button_height
             width: $button_width
@@ -753,8 +882,7 @@ lvgl:
                   data:
                     entity_id: scene.nuit
 
-        # ── Mode réveil ─────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Mode réveil ───────────────────────────────────────
         - button:
             height: $button_height
             width: $button_width
@@ -774,8 +902,7 @@ lvgl:
                   data:
                     entity_id: scene.reveil
 
-        # ── Appel vidéo ─────────────────────────
-        # Adapter entity_id à ta scène HA
+        # ── Appel vidéo ───────────────────────────────────────
         - button:
             height: $button_height
             width: $button_width
